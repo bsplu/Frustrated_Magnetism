@@ -1,6 +1,6 @@
 //============================================================================
 // Name        : Frustrated.cpp
-// Author      : BSheng  &¡¡YHH
+// Author      : BSheng  &  YHH
 // Version     :
 // Copyright   : Your copyright notice
 // Description : Hello World in C++, Ansi-style
