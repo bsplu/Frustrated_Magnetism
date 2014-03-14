@@ -158,12 +158,11 @@ void read_txt(person * arry_person,int & leng_s_arry_person) {
 		int p_id_pre_local, brand_id_local, type_local,
 				visit_datetime_day_local, visit_datetime_month_local;
 
-		fscanf(fp, "%d,%d,%d,%d日%d月", &p_id_pre_local, &brand_id_local,
+		fscanf(fp, "%d,%d,%d,%d月%d日\n", &p_id_pre_local, &brand_id_local,
 				&type_local, &visit_datetime_month_local,
 				&visit_datetime_day_local);
 
 		i_line++;
-
 		if (p_id_pre == p_id_pre_local) {
 			//继续当前用户
 
@@ -220,6 +219,6 @@ void read_txt(person * arry_person,int & leng_s_arry_person) {
 	}
 
 	//读取完毕
-
+	//cout<<"读取完毕"<<endl;
 }
 
