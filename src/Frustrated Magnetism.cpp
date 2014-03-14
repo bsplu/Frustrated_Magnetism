@@ -152,9 +152,11 @@ int main() {
 	read_txt( arry_person,leng_s_arry_person);
 
 
-	cout<<leng_s_arry_person<<endl;
-
-	cout<<arry_person[0].p_buyimformation[0].brand_id<<endl;
+	//访问单个用户例子
+	for(int i=0;i<arry_person[0].leng_s_p_buyim;i++){
+		BuyImformation *p = arry_person[0].p_buyimformation;
+		cout<<p[i].brand_id<<"\t"<<p[i].type<<"\t"<<p[i].visit_datetime_month<<"月"<<p[i].visit_datetime_day<<"日"<<endl;
+	}
 
 	return 0;
 }
