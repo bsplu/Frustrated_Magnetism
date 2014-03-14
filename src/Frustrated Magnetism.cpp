@@ -275,10 +275,20 @@ void read_txt(person* &arry_person_inpute, int & leng_s_arry_person) {
 						//满足同天购买查看条件，将该条删除
 
 						arry_person[leng_s_arry_person-2].delete_one_p_buy(i);
-
+						i--;
 						if(i<i_brand_id){
 							i_brand_id--;
 						}
+					}else if(p_buyim_local[i].brand_id == buybrand_id && p_buyim_local[i].visit_datetime_month == buymonth
+							&& p_buyim_local[i].visit_datetime_day == buyday && p_buyim_local[i].type == 1 && i != i_brand_id){
+						//一天中多次购买一样商品也会删除掉
+
+						arry_person[leng_s_arry_person-2].delete_one_p_buy(i);
+						i--;
+						if(i<i_brand_id){
+							i_brand_id--;
+						}
+
 					}
 				}
 				i_brand_id++;
