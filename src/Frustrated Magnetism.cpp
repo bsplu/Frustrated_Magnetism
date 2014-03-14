@@ -20,7 +20,7 @@ using namespace std;
 class BuyImformation {
 public:
 	int brand_id;
-	int type;
+	int type;//点击：0；购买：1；收藏：2；购物车：3
 	int visit_datetime_month;
 	int visit_datetime_day;
 
@@ -115,7 +115,13 @@ public:
 		}
 	}
 
-
+	void delete_one_p_buy(int i_brand){
+		//i_brand为数组位置
+		for(int i=i_brand;i<leng_s_p_buyim-1;i++){
+			p_buyimformation[i] = p_buyimformation[i+1];
+		}
+		leng_s_p_buyim--;
+	}
 
 	person & operator=(person a){
 		p_id = a.p_id;
@@ -153,8 +159,9 @@ int main() {
 
 
 	//访问单个用户例子
+	BuyImformation *p = arry_person[0].p_buyimformation;
+
 	for(int i=0;i<arry_person[0].leng_s_p_buyim;i++){
-		BuyImformation *p = arry_person[0].p_buyimformation;
 		cout<<p[i].brand_id<<"\t"<<p[i].type<<"\t"<<p[i].visit_datetime_month<<"月"<<p[i].visit_datetime_day<<"日"<<endl;
 	}
 
@@ -242,8 +249,45 @@ void read_txt(person* &arry_person_inpute, int & leng_s_arry_person) {
 
 			//将上一个用户内存进行优化{-------------------------------------------------
 			//将p_buyimformation中没有使用的多余的数组删掉，使得leng=leng_s
-			if(leng_s_arry_person != 1)
+			if(leng_s_arry_person != 1){
+
+				//如果用户在某一天day1购买了商品a则在day1当天查看a的信息删除
+
+				BuyImformation *p_buyim_local = arry_person[leng_s_arry_person-2].p_buyimformation;
+				int i_brand_id = 0;
+				do{
+					int buyday(0),buymonth(0),buybrand_id(0);
+				for(;i_brand_id<arry_person[leng_s_arry_person-2].leng_s_p_buyim;i_brand_id++){
+					if(p_buyim_local[i_brand_id].type == 1){
+						buybrand_id = p_buyim_local[i_brand_id].brand_id;
+						buymonth = p_buyim_local[i_brand_id].visit_datetime_month;
+						buyday = p_buyim_local[i_brand_id].visit_datetime_day;
+						break;
+					}
+				}
+
+				if(i_brand_id == arry_person[leng_s_arry_person-2].leng_s_p_buyim)
+					break;
+
+				for(int i=0;i<arry_person[leng_s_arry_person-2].leng_s_p_buyim;i++){
+					if(p_buyim_local[i].brand_id == buybrand_id && p_buyim_local[i].visit_datetime_month == buymonth
+							&& p_buyim_local[i].visit_datetime_day == buyday && p_buyim_local[i].type == 0){
+						//满足同天购买查看条件，将该条删除
+
+						arry_person[leng_s_arry_person-2].delete_one_p_buy(i);
+
+						if(i<i_brand_id){
+							i_brand_id--;
+						}
+					}
+				}
+				i_brand_id++;
+				}while(1);
+
+
+
 				arry_person[leng_s_arry_person-2].optimize_p_buy();
+			}
 			//优化}===============================================================
 
 		}
