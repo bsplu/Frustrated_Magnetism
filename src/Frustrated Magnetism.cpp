@@ -476,6 +476,25 @@ void solution1(person * arry_person_input,int leng_s_arry_person_input){
  * by BSheng
  * 采用加权平均
  * 提出两个概念：
- * 1.购买滞后期：购买者在购买物品的前期查看天数，例如：购买者P在买物品a之前提前b天开始查看
- * 2.购买（概）率：购买者购买物品种类数/查看物品种类数
+ * 1.购买考察期：购买者在购买物品的前期查看天数，例如：购买者P在买物品a之前提前b天开始查看
+ * 2.购买（概）率：购买者对于有规律的购买物品种类数/查看物品种类数
  */
+
+void solution2(person * arry_person_input,int leng_s_arry_person_input){
+	person * arry_person = new person [leng_s_arry_person_input];
+	int leng_s_arry_person = leng_s_arry_person_input;
+	for(int i=0;i<leng_s_arry_person;i++){
+		arry_person[i] = arry_person_input[i];
+	}
+
+
+	//我们认为一个人在买完一个商品连续的时间内查看商品的信息是对购买信息没有帮助的，应当删除
+	/*测试出用户的购买习惯:
+	 * 1.购买考察期：一个用户在购买前，一般会提前多少天开始购买
+	 * 2.考察频率：用户在考察一个商品时，大致多长时间会浏览一次商品
+	 */
+
+
+}
+
+
