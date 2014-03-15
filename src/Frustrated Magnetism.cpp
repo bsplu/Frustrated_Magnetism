@@ -147,8 +147,9 @@ public:
 
 int main() {
 	void read_txt(person* &arry_person, int & leng_s_arry_person);
+	void solution1(person * arry_person_input,int leng_s_arry_person_input);
 
-
+	srand((unsigned) time(NULL));
 	person * arry_person = NULL;
 	int leng_s_arry_person=0;
 
@@ -157,15 +158,14 @@ int main() {
 
 	read_txt( arry_person,leng_s_arry_person);
 
-
-	//访问单个用户例子
-	BuyImformation *p = arry_person[0].p_buyimformation;
-
-	for(int i=0;i<arry_person[0].leng_s_p_buyim;i++){
-		cout<<p[i].brand_id<<"\t"<<p[i].type<<"\t"<<p[i].visit_datetime_month<<"月"<<p[i].visit_datetime_day<<"日"<<endl;
-	}
+	solution1(arry_person,leng_s_arry_person);
 
 	return 0;
+}
+
+double randoms(double b=0.0,double e=1.0){
+
+	return (e-b)*double(rand())/double(RAND_MAX)+b;
 }
 
 void read_txt(person* &arry_person_inpute, int & leng_s_arry_person) {
@@ -249,6 +249,7 @@ void read_txt(person* &arry_person_inpute, int & leng_s_arry_person) {
 
 			//将上一个用户内存进行优化{-------------------------------------------------
 			//将p_buyimformation中没有使用的多余的数组删掉，使得leng=leng_s
+
 			if(leng_s_arry_person != 1){
 
 				//如果用户在某一天day1购买了商品a则在day1当天查看a的信息删除
@@ -275,19 +276,21 @@ void read_txt(person* &arry_person_inpute, int & leng_s_arry_person) {
 						//满足同天购买查看条件，将该条删除
 
 						arry_person[leng_s_arry_person-2].delete_one_p_buy(i);
-						i--;
+
 						if(i<i_brand_id){
 							i_brand_id--;
 						}
+						i--;
 					}else if(p_buyim_local[i].brand_id == buybrand_id && p_buyim_local[i].visit_datetime_month == buymonth
 							&& p_buyim_local[i].visit_datetime_day == buyday && p_buyim_local[i].type == 1 && i != i_brand_id){
 						//一天中多次购买一样商品也会删除掉
 
 						arry_person[leng_s_arry_person-2].delete_one_p_buy(i);
-						i--;
+
 						if(i<i_brand_id){
 							i_brand_id--;
 						}
+						i--;
 
 					}
 				}
@@ -321,3 +324,158 @@ void read_txt(person* &arry_person_inpute, int & leng_s_arry_person) {
 	}
 }
 
+
+//返回两个日期之间的天数间隔
+int day_gap(int month1,int day1,int month2,int day2){
+
+
+
+	int m_b = month1;
+	int m_s = month2;
+	int d_b = day1;
+	int d_s = day2;
+	int sign = 1;
+
+	if(month2 > month1 ){
+		m_b = month2;
+		d_b = day2;
+		m_s = month1;
+		d_s = day1;
+		sign = -1;
+	}else if(month1 == month2){
+		return (day1 - day2);
+	}
+
+	return sign*((m_b-m_s)*30-d_b+d_s);
+
+}
+
+//算法1
+/*
+ * by YHH
+ * 采用完全随机的思想
+ *
+ * 购买者在购买物品a后的20天内查看不做贡献，预测按照该顾客以往查看商品种类以1/2的概率来进行之后是否购买
+ * 挑选预测购买者名单：以随机的概率进行随机挑选
+ */
+
+void solution1(person * arry_person_input,int leng_s_arry_person_input){
+	person * arry_person = new person [leng_s_arry_person_input];
+	int leng_s_arry_person = leng_s_arry_person_input;
+	for(int i=0;i<leng_s_arry_person;i++){
+		arry_person[i] = arry_person_input[i];
+	}
+
+	//购买物品a后的20天内查看记录删除{----------------------------------------------------------------------
+
+	for(int i_s=0;i_s<leng_s_arry_person;i_s++){
+		int i_brand_id = 0;
+		BuyImformation *p_buyim_local = arry_person[i_s].p_buyimformation;
+		do{
+			int buyday(0),buymonth(0),buybrand_id(0);
+			for(;i_brand_id<arry_person[i_s].leng_s_p_buyim;i_brand_id++){
+									if(p_buyim_local[i_brand_id].type == 1){
+										buybrand_id = p_buyim_local[i_brand_id].brand_id;
+										buymonth = p_buyim_local[i_brand_id].visit_datetime_month;
+										buyday = p_buyim_local[i_brand_id].visit_datetime_day;
+										break;
+									}
+								}
+			if(i_brand_id == arry_person[i_s].leng_s_p_buyim)
+				break;
+			for(int i=0;i<arry_person[i_s].leng_s_p_buyim;i++){
+				int d_gap = day_gap(p_buyim_local[i].visit_datetime_month,p_buyim_local[i].visit_datetime_day,
+						buymonth,buyday);
+				if(!(d_gap>0 && d_gap <20))
+					continue;
+
+				if(p_buyim_local[i].brand_id == buybrand_id && p_buyim_local[i].type == 0){
+					//满足20天内查看
+
+					arry_person[i_s].delete_one_p_buy(i);
+
+					if(i<i_brand_id){
+						i_brand_id--;
+					}
+					i--;
+				}
+			}
+			i_brand_id++;
+		}while(1);
+	}
+	//20天end}===========================================================================================
+
+	FILE *fp = fopen("solution1.txt","w");
+
+	double P_person = randoms();//预测者名单概率
+	for(int i_s=0;i_s<leng_s_arry_person;i_s++){
+		if(randoms()>P_person)
+			continue;
+
+		double P_buy = randoms();
+		int leng_buylist = 100;
+		int leng_s_buylist = 0;
+		int *Buylist = new int [leng_buylist];
+
+
+		BuyImformation *p_s_local = arry_person[i_s].p_buyimformation;
+		for(int i_pbi=0;i_pbi<arry_person[i_s].leng_s_p_buyim;i_pbi++){
+			//P_buy = randoms();
+			if(randoms()>P_buy && p_s_local[i_pbi].type != 1){
+				continue;
+			}
+
+			if(leng_s_buylist == leng_buylist){
+				//扩容
+				int *Buylist_local = new int [leng_buylist];
+				for(int i=0;i<leng_buylist;i++){
+					Buylist_local[i] = Buylist[i];
+				}
+				delete [] Buylist;
+				Buylist = NULL;
+				Buylist = new int [leng_buylist*2];
+				for(int i=0;i<leng_buylist;i++){
+					Buylist[i] = Buylist_local[i];
+				}
+				leng_buylist*=2;
+				delete [] Buylist_local;
+				Buylist_local = NULL;
+			}
+			Buylist[leng_s_buylist] = p_s_local[i_pbi].brand_id;
+			leng_s_buylist++;
+	}
+
+		//检查删除buylist中重复的项
+		for(int i=0;i<leng_s_buylist;i++){
+			for(int j=0;j<leng_s_buylist;j++){
+				if(i == j)
+					continue;
+				if(Buylist[i] == Buylist[j]){
+					for(int k=j;k<leng_s_buylist-1;k++){
+						Buylist[k] = Buylist[k+1];
+					}
+
+					if(j<i)
+						i--;
+					j--;
+					leng_s_buylist--;
+				}
+			}
+		}
+		//输出
+		fprintf(fp,"%d\t",arry_person[i_s].get_person_id());
+		for(int i=0;i<leng_s_buylist-1;i++){
+				fprintf(fp,"%d,",Buylist[i]);
+		}
+		fprintf(fp,"%d\n",Buylist[leng_s_buylist-1]);
+	}
+
+}
+//算法2
+/*
+ * by BSheng
+ * 采用加权平均
+ * 提出两个概念：
+ * 1.购买滞后期：购买者在购买物品的前期查看天数，例如：购买者P在买物品a之前提前b天开始查看
+ * 2.购买（概）率：购买者购买物品种类数/查看物品种类数
+ */
