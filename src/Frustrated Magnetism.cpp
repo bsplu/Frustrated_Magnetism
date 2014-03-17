@@ -32,6 +32,7 @@ public:
 		visit_datetime_day = visit_datetime_day_input;
 	}
 
+
 	BuyImformation & operator=(BuyImformation a){
 		this->brand_id = a.brand_id;
 		this->type = a.type;
@@ -145,9 +146,14 @@ public:
 
 };
 
+void BubbleSort(BuyImformation * pData, int Count);
+int compare(BuyImformation a,BuyImformation b);
+
+
 int main() {
 	void read_txt(person* &arry_person, int & leng_s_arry_person);
 	void solution1(person * arry_person_input,int leng_s_arry_person_input);
+	void solution2(person * arry_person_input,int leng_s_arry_person_input);
 
 	srand((unsigned) time(NULL));
 	person * arry_person = NULL;
@@ -158,7 +164,7 @@ int main() {
 
 	read_txt( arry_person,leng_s_arry_person);
 
-	solution1(arry_person,leng_s_arry_person);
+	solution2(arry_person,leng_s_arry_person);
 
 	return 0;
 }
@@ -491,10 +497,122 @@ void solution2(person * arry_person_input,int leng_s_arry_person_input){
 	//我们认为一个人在买完一个商品连续的时间内查看商品的信息是对购买信息没有帮助的，应当删除
 	/*测试出用户的购买习惯:
 	 * 1.购买考察期：一个用户在购买前，一般会提前多少天开始购买
-	 * 2.考察频率：用户在考察一个商品时，大致多长时间会浏览一次商品
+	 * 2.考察频率，强度：用户在考察一个商品时，大致多长时间会浏览一次商品，以及用户在考察时单天考察次数
+	 *
+	 * 具体刻画方法：
+	 * 1.存在考察周期d
+	 * 2.考察强度平均值：考察总次数/考察周期
+	 * 3.考察强度方差：为考察强度平均值的方差，反应单天考察强度
+	 * 4.考察平均值：考察时间距购买时间的平均值
 	 */
+
+
+	/*
+	 * 首要任务是查看该方案是否具有可行性，即猜想的规律是否存在
+	 *
+	 */
+
+
+	double arry_p_b_hbt[3][leng_s_arry_person];//[0]位储存平均值，[1]位储存标准差，[2]位储存个数
+	for(int i_a_p=0;i_a_p<leng_s_arry_person;i_a_p++){
+
+
+		arry_p_b_hbt[0][i_a_p] = 0;
+		arry_p_b_hbt[1][i_a_p] = 0;
+		arry_p_b_hbt[2][i_a_p] = 0;
+
+		//首先看看有没有考察周期之说
+		BuyImformation * p_bimf_l = arry_person[i_a_p].p_buyimformation;
+		//先按id排个序
+		BubbleSort(p_bimf_l,arry_person[i_a_p].leng_s_p_buyim);
+/*
+		for(int i=0;i<arry_person[i_a_p].leng_s_p_buyim;i++){
+			cout<<p_bimf_l[i].brand_id<<"\t"<<p_bimf_l[i].type<<"\t"<<p_bimf_l[i].visit_datetime_month<<"."<<p_bimf_l[i].visit_datetime_day<<endl;
+		}
+		cout<<"======================================="<<endl;
+*/
+
+
+		for(int i_b=0;i_b<arry_person[i_a_p].leng_s_p_buyim;i_b++){
+			if(p_bimf_l[i_b].type == 1){
+				BuyImformation b_local;
+				b_local = p_bimf_l[i_b];
+				//检查之前是否购买过同个商品
+		//		int check_d_b = 0;
+		//		int check_m_b = 0;
+				int i_b_b =i_b-1;//运行后刚好是一个brand_id的起始位置
+				int i_b_b_l = 0;
+				for(;(p_bimf_l[i_b_b].brand_id == b_local.brand_id && i_b_b>=0);i_b_b--){
+					if(p_bimf_l[i_b_b].type == 1){
+		//				check_m_b = p_bimf_l[i_b_b].visit_datetime_month;
+		//				check_d_b = p_bimf_l[i_b_b].visit_datetime_day;
+						i_b_b_l = i_b_b;
+					}
+				}
+				i_b_b_l = i_b_b_l == 0? i_b_b+1:i_b_b_l+1;
+				//开始记录平均值
+				int day_gap_value = day_gap(p_bimf_l[i_b].visit_datetime_month,p_bimf_l[i_b].visit_datetime_day,
+						p_bimf_l[i_b_b_l].visit_datetime_month,p_bimf_l[i_b_b_l].visit_datetime_day);
+				if(day_gap_value < 0)
+					exit(0);
+
+				arry_p_b_hbt[0][i_a_p] += double(day_gap_value);
+				arry_p_b_hbt[1][i_a_p] += double(day_gap_value * day_gap_value);
+				arry_p_b_hbt[2][i_a_p] += 1.0;
+			}
+		}
+
+		if(arry_p_b_hbt[1][i_a_p] != 0){
+		arry_p_b_hbt[1][i_a_p] = sqrt(arry_p_b_hbt[1][i_a_p]/arry_p_b_hbt[2][i_a_p]-
+				arry_p_b_hbt[0][i_a_p] * arry_p_b_hbt[0][i_a_p]/(arry_p_b_hbt[2][i_a_p]*arry_p_b_hbt[2][i_a_p]));
+		arry_p_b_hbt[0][i_a_p] /= arry_p_b_hbt[2][i_a_p];
+		}
+
+
+		if(arry_p_b_hbt[0][i_a_p]*1.5 > arry_p_b_hbt[1][i_a_p] && arry_p_b_hbt[0][i_a_p] >2 && arry_p_b_hbt[2][i_a_p] > 2)
+			cout<<i_a_p+1<<"\t"<<arry_p_b_hbt[0][i_a_p]<<"\t"<<arry_p_b_hbt[1][i_a_p]<<"\t"<<arry_p_b_hbt[2][i_a_p]<<endl;
+
+	}
+
 
 
 }
 
+void BubbleSort(BuyImformation * pData, int Count) {
+	BuyImformation iTemp;
+	for (int i = 0; i < Count; i++) {
+		for (int j = Count - 1; j > i; j--) {
+			if (pData[j].brand_id < pData[j - 1].brand_id) {
+				iTemp = pData[j - 1];
+				pData[j - 1] = pData[j];
+				pData[j] = iTemp;
 
+			}else if(pData[j].brand_id == pData[j - 1].brand_id){
+				//日期小的在前面
+				if(pData[j].visit_datetime_month<pData[j-1].visit_datetime_month ||
+						(pData[j].visit_datetime_month==pData[j-1].visit_datetime_month &&
+								pData[j].visit_datetime_day<pData[j-1].visit_datetime_day)){
+					iTemp = pData[j - 1];
+					pData[j - 1] = pData[j];
+					pData[j] = iTemp;
+				}
+			}
+		}
+	}
+}
+int compare(BuyImformation a,BuyImformation b){
+	//1,-1,0对应大于等于，小于
+	int a_d = a.visit_datetime_day+a.visit_datetime_month*100;
+	int b_d = b.visit_datetime_day+b.visit_datetime_month*100;
+
+	a_d -= b_d;
+	if(a_d > 0){
+		return 1;
+	}else if(a_d == 0){
+		return 0;
+	}else if(a_d < 0){
+		return -1;
+	}else {
+		return -2;
+	}
+}
