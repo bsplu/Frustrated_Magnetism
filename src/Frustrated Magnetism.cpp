@@ -15,6 +15,8 @@
 #include <sstream>
 #include <omp.h>
 
+#include<windows.h>
+
 using namespace std;
 
 class BuyImformation {
@@ -513,15 +515,17 @@ void solution2(person * arry_person_input,int leng_s_arry_person_input){
 	 */
 
 
-	double arry_p_b_hbt[3][leng_s_arry_person];//[0]位储存平均值，[1]位储存标准差，[2]位储存个数
+	double arry_p_b_hbt[8][leng_s_arry_person];
+	//[0]位储存购买天数平均值，[1]位储存天数标准差，[2]位储存购买个数，[3]查看频率平均值，4查看频率标准偏差，5查看频率次数
+	//6单天查看次数平均值，7单天查看次数标准差，8单天查看次数个数
 	for(int i_a_p=0;i_a_p<leng_s_arry_person;i_a_p++){
 
+		for(int i=0;i<8;i++){
+			arry_p_b_hbt[i][i_a_p] = 0;
 
-		arry_p_b_hbt[0][i_a_p] = 0;
-		arry_p_b_hbt[1][i_a_p] = 0;
-		arry_p_b_hbt[2][i_a_p] = 0;
+		}
 
-		//首先看看有没有考察周期之说
+
 		BuyImformation * p_bimf_l = arry_person[i_a_p].p_buyimformation;
 		//先按id排个序
 		BubbleSort(p_bimf_l,arry_person[i_a_p].leng_s_p_buyim);
@@ -538,23 +542,54 @@ void solution2(person * arry_person_input,int leng_s_arry_person_input){
 				BuyImformation b_local;
 				b_local = p_bimf_l[i_b];
 				//检查之前是否购买过同个商品
-		//		int check_d_b = 0;
-		//		int check_m_b = 0;
+				int check_d_b = 0;
+				int check_m_b = 0;
 				int i_b_b =i_b-1;//运行后刚好是一个brand_id的起始位置
 				int i_b_b_l = 0;
 				for(;(p_bimf_l[i_b_b].brand_id == b_local.brand_id && i_b_b>=0);i_b_b--){
 					if(p_bimf_l[i_b_b].type == 1){
-		//				check_m_b = p_bimf_l[i_b_b].visit_datetime_month;
-		//				check_d_b = p_bimf_l[i_b_b].visit_datetime_day;
+
 						i_b_b_l = i_b_b;
 					}
 				}
 				i_b_b_l = i_b_b_l == 0? i_b_b+1:i_b_b_l+1;
+				check_m_b = p_bimf_l[i_b_b_l].visit_datetime_month;
+				check_d_b = p_bimf_l[i_b_b_l].visit_datetime_day;
 				//开始记录平均值
 				int day_gap_value = day_gap(p_bimf_l[i_b].visit_datetime_month,p_bimf_l[i_b].visit_datetime_day,
 						p_bimf_l[i_b_b_l].visit_datetime_month,p_bimf_l[i_b_b_l].visit_datetime_day);
 				if(day_gap_value < 0)
 					exit(0);
+				if(day_gap_value == 0)
+					continue;
+				//cout<<day_gap_value<<endl;
+
+				double day_F_av = 0;
+				double day_F_std = 0;
+				int day_F_av_num = 0;
+				for(int i=i_b_b_l;i<=i_b;i++){
+
+					//该处仅是对频率做统计，所以如果是同一天查看就跳过
+					if(!(p_bimf_l[i].visit_datetime_month == check_m_b && p_bimf_l[i].visit_datetime_day ==check_d_b)){
+
+					//cout<<p_bimf_l[i].visit_datetime_month<<"\t"<<p_bimf_l[i].visit_datetime_day<<endl;
+						int day_str_local = day_gap(p_bimf_l[i].visit_datetime_month,p_bimf_l[i].visit_datetime_day,
+								check_m_b,check_d_b);
+						day_F_av += double(day_str_local);
+						day_F_std += double(day_str_local*day_str_local);
+						day_F_av_num++;
+						check_m_b = p_bimf_l[i].visit_datetime_month;
+						check_d_b = p_bimf_l[i].visit_datetime_day;
+					}
+
+				}
+				day_F_std = sqrt(day_F_std/double(day_F_av_num)-
+						day_F_av*day_F_av/double(day_F_av_num*day_F_av_num))/double(day_gap_value);
+				day_F_av /= (double(day_F_av_num)*day_gap_value);
+
+				if(day_F_av_num>=3)
+					cout<<day_F_av<<"\t"<<day_F_std<<"\t"<<day_F_av_num<<endl;
+
 
 				arry_p_b_hbt[0][i_a_p] += double(day_gap_value);
 				arry_p_b_hbt[1][i_a_p] += double(day_gap_value * day_gap_value);
@@ -569,8 +604,10 @@ void solution2(person * arry_person_input,int leng_s_arry_person_input){
 		}
 
 
-		if(arry_p_b_hbt[0][i_a_p]*1.5 > arry_p_b_hbt[1][i_a_p] && arry_p_b_hbt[0][i_a_p] >2 && arry_p_b_hbt[2][i_a_p] > 2)
-			cout<<i_a_p+1<<"\t"<<arry_p_b_hbt[0][i_a_p]<<"\t"<<arry_p_b_hbt[1][i_a_p]<<"\t"<<arry_p_b_hbt[2][i_a_p]<<endl;
+			cout<<"--------------------------------------------------------"<<endl;
+		//	system("pause");
+		//	cout<<i_a_p+1<<"\t"<<arry_p_b_hbt[0][i_a_p]<<"\t"<<arry_p_b_hbt[1][i_a_p]<<"\t"<<arry_p_b_hbt[2][i_a_p]<<endl;
+		//	cout<<"====================================================================================="<<endl;
 
 	}
 
