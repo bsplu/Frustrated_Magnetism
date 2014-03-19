@@ -609,6 +609,7 @@ void solution2(person * arry_person_input, int leng_s_arry_person_input) {
 
 		}
 
+		/*
 		cout << i_a_p + 1 << "\t" << arry_p_b_hbt[2][i_a_p] << "\n\t"
 				<< arry_p_b_hbt[0][i_a_p] << "\t" << arry_p_b_hbt[1][i_a_p]
 				<< endl;
@@ -617,9 +618,60 @@ void solution2(person * arry_person_input, int leng_s_arry_person_input) {
 		cout
 				<< "====================================================================================="
 				<< endl;
+	*/
+
 
 	}
 
+	//预测将会购买的物品
+	//f(x)=1/(sqrt(2*Pi)*sigma)*exp(-1*(x-miu)^2/(2*sigma^2))
+	//商品是从8月15号开始的预测
+	//x轴的零点是开始查看的日期
+	for (int i_a_p = 0; i_a_p < leng_s_arry_person; i_a_p++) {
+		BuyImformation *p = arry_person[i_a_p].p_buyimformation;
+		//test{
+			//看一个人买一个东西后又买一次的可能性
+
+		int i_brand_e = 0;
+		int i_brand_b = 0;
+
+		for(;i_brand_e<arry_person[i_a_p].leng_s_p_buyim;i_brand_e++){
+			if(p[i_brand_b].brand_id != p[i_brand_e].brand_id){
+				BuyImformation buy;
+				int num_buy(0);
+				for(int i=i_brand_b;i<i_brand_e;i++){
+					if(p[i].type == 1){
+						if(num_buy == 0){
+							num_buy ++;
+							buy = p[i];
+						}else{
+							if(compare(buy,p[i]) == 0)
+								continue;
+							else{
+								num_buy++;
+
+							}
+						}
+					}
+				}
+
+				if(num_buy >1){
+					cout<<num_buy<<endl;
+					for(int i=i_brand_b;i<i_brand_e;i++){
+						if(p[i].type == 1)
+							cout<<p[i].visit_datetime_month<<"."<<p[i].visit_datetime_day<<endl;
+					}
+					cout<<"===============================\n";
+				}
+
+				i_brand_b = i_brand_e;
+				break;
+			}
+
+		}
+
+		//发现确实有人会隔一段时间海通一个商品
+	}
 
 }
 
