@@ -525,42 +525,42 @@ void solution2(person * arry_person_input, int leng_s_arry_person_input) {
 	 */
 
 	int **arry_buy_list = new int *[leng_s_arry_person];
+	int leng_s_a_b_l[leng_s_arry_person];
 	int leng_a_b_l[leng_s_arry_person];
-	//预测将会购买的物品
-	//f(x)=1/(sqrt(2*Pi)*sigma)*exp(-1*(x-miu)^2/(2*sigma^2))
-	//商品是从8月15号开始的预测
-	//x轴的零点是开始查看的日期
+
 
 	for (int i_a_p = 0; i_a_p < leng_s_arry_person; i_a_p++) {
 
-
-		leng_a_b_l[i_a_p] = 0;
-		arry_buy_list[i_a_p] = new int [200];
+		leng_s_a_b_l[i_a_p] = 0;
+		leng_a_b_l[i_a_p] = 200;
+		arry_buy_list[i_a_p] = new int[leng_a_b_l[i_a_p]];
 		BuyImformation *p = arry_person[i_a_p].p_buyimformation;
 		//先按id排个序
 		BubbleSort(p, arry_person[i_a_p].leng_s_p_buyim);
 		//test{
-			//看一个人买一个东西后又买一次的可能性
-
+		//看一个人买一个东西后又买一次的可能性
 
 		int i_brand_e = 0;
 		int i_brand_b = 0;
-		for(;i_brand_e<arry_person[i_a_p].leng_s_p_buyim;i_brand_e++){
-			if(p[i_brand_b].brand_id != p[i_brand_e].brand_id){
-
+		for (; i_brand_e < arry_person[i_a_p].leng_s_p_buyim; i_brand_e++) {
+			if (p[i_brand_b].brand_id != p[i_brand_e].brand_id) {
 
 				BuyImformation buy[20];
 				int leng_s_buy = 0;
-				for(int i=i_brand_b;i<i_brand_e;i++){
-					if(p[i].type == 1){
-						if(leng_s_buy == 0){
+				for (int i = i_brand_b; i < i_brand_e; i++) {
+					if (p[i].type == 1) {
+						if (leng_s_buy == 0) {
 							buy[leng_s_buy] = p[i];
 							leng_s_buy++;
-						}else{
-							if(abs(day_gap(buy[leng_s_buy-1].visit_datetime_month,buy[leng_s_buy-1].visit_datetime_day,
-									p[i].visit_datetime_month,p[i].visit_datetime_day)) <= 2)
+						} else {
+							if (abs(
+									day_gap(
+											buy[leng_s_buy - 1].visit_datetime_month,
+											buy[leng_s_buy - 1].visit_datetime_day,
+											p[i].visit_datetime_month,
+											p[i].visit_datetime_day)) <= 2)
 								continue;
-							else{
+							else {
 								buy[leng_s_buy] = p[i];
 								leng_s_buy++;
 							}
@@ -568,19 +568,28 @@ void solution2(person * arry_person_input, int leng_s_arry_person_input) {
 					}
 				}
 
-				if(leng_s_buy >1){
+				if (leng_s_buy > 1) {
 
 					//粗暴的认为超过两次就有购买周期
-					int T = double(day_gap(buy[leng_s_buy-1].visit_datetime_month,buy[leng_s_buy-1].visit_datetime_day,
-							buy[0].visit_datetime_month,buy[0].visit_datetime_day))/double(leng_s_buy);
+					int T = double(
+							day_gap(buy[leng_s_buy - 1].visit_datetime_month,
+									buy[leng_s_buy - 1].visit_datetime_day,
+									buy[0].visit_datetime_month,
+									buy[0].visit_datetime_day))
+							/ double(leng_s_buy);
 					//看一下下一次购买是否在预测区间内
-					if(day_gap(8,16,buy[leng_s_buy-1].visit_datetime_month,buy[leng_s_buy-1].visit_datetime_day) <= T
-							&& day_gap(9,15,buy[leng_s_buy-1].visit_datetime_month,buy[leng_s_buy-1].visit_datetime_day) > T ){
+					if (day_gap(8, 16, buy[leng_s_buy - 1].visit_datetime_month,
+							buy[leng_s_buy - 1].visit_datetime_day) <= T
+							&& day_gap(9, 15,
+									buy[leng_s_buy - 1].visit_datetime_month,
+									buy[leng_s_buy - 1].visit_datetime_day)
+									> T) {
 						//在预测区间，添加到购买列表中
-						arry_buy_list[i_a_p][leng_a_b_l[i_a_p]] = buy[0].brand_id;
-						leng_a_b_l[i_a_p]++;
+						arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
+								buy[0].brand_id;
+						leng_s_a_b_l[i_a_p]++;
 						//删除掉该品牌的全部信息
-						for(int i=i_brand_b;i<i_brand_e;i++){
+						for (int i = i_brand_b; i < i_brand_e; i++) {
 							arry_person[i_a_p].delete_one_p_buy(i_brand_b);
 
 						}
@@ -590,14 +599,13 @@ void solution2(person * arry_person_input, int leng_s_arry_person_input) {
 				}
 
 				i_brand_b = i_brand_e;
+				i_brand_e--;
 
 			}
 
 		}
 
 	}
-
-
 
 	const int num_kind_arry_pbhbt = 5;
 	double arry_p_b_hbt[num_kind_arry_pbhbt][leng_s_arry_person];
@@ -610,7 +618,6 @@ void solution2(person * arry_person_input, int leng_s_arry_person_input) {
 		}
 
 		BuyImformation * p_bimf_l = arry_person[i_a_p].p_buyimformation;
-
 
 		for (int i_b = 0; i_b < arry_person[i_a_p].leng_s_p_buyim; i_b++) {
 			if (p_bimf_l[i_b].type == 1) {
@@ -648,8 +655,7 @@ void solution2(person * arry_person_input, int leng_s_arry_person_input) {
 						/ double(day_gap_value);
 				arry_p_b_hbt[3][i_a_p] += num_check_rel;
 				arry_p_b_hbt[4][i_a_p] += num_check_rel * num_check_rel;
-				//cout<<arry_p_b_hbt[4][i_a_p]<<endl;
-				//	cout<<"++++++++++++++++++++++++++++++++++++++++++++++++++"<<endl;
+
 			}
 		}
 
@@ -667,9 +673,9 @@ void solution2(person * arry_person_input, int leng_s_arry_person_input) {
 										* arry_p_b_hbt[3][i_a_p]
 										/ (arry_p_b_hbt[2][i_a_p]
 												* arry_p_b_hbt[2][i_a_p]));
-			} else{
-			arry_p_b_hbt[1][i_a_p] = 0;
-			arry_p_b_hbt[4][i_a_p] = 0;
+			} else {
+				arry_p_b_hbt[1][i_a_p] = 0;
+				arry_p_b_hbt[4][i_a_p] = 0;
 			}
 
 			arry_p_b_hbt[0][i_a_p] /= arry_p_b_hbt[2][i_a_p];
@@ -678,6 +684,112 @@ void solution2(person * arry_person_input, int leng_s_arry_person_input) {
 		}
 	}
 
+	ofstream fout("solution2.txt");
+	//预测将会购买的物品
+	//f(x)=1/(sqrt(2*Pi)*sigma)*exp(-1*(x-miu)^2/(2*sigma^2))
+	//商品是从8月15号开始的预测
+	//x轴的零点是开始查看的日期
+	for (int i_a_p = 0; i_a_p < leng_s_arry_person; i_a_p++) {
+
+		BuyImformation *p = arry_person[i_a_p].p_buyimformation;
+
+		int i_brand_e = 0;
+		int i_brand_b = 0;
+		BuyImformation buy_local;
+		bool ifbuy = false;
+		for (; i_brand_e < arry_person[i_a_p].leng_s_p_buyim; i_brand_e++) {
+
+
+			//我们认为在4个月的时间内，买过一个物品后段时间之内是不会再买该物品的，将买过的物品买后一个月到第一次查看的信息清除
+			if(p[i_brand_e].type == 1 && p[i_brand_b].brand_id == p[i_brand_e].brand_id){
+				ifbuy = true;
+				buy_local = p[i_brand_e];
+			}
+
+			if (p[i_brand_b].brand_id != p[i_brand_e].brand_id) {
+
+				if(ifbuy){
+					//删除该物品购买后一个月内及购买前的全部信息
+					int i=0;
+					int gap_local = i_brand_e-i_brand_b;
+					for(;i<gap_local;i++){
+						if(day_gap(p[i+i_brand_b].visit_datetime_month,p[i+i_brand_b].visit_datetime_day,
+								buy_local.visit_datetime_month,buy_local.visit_datetime_day) < 30){
+							arry_person[i_a_p].delete_one_p_buy(i_brand_b);
+						}else{
+							i++;
+							break;
+						}
+					}
+					i_brand_e -= i;
+
+					ifbuy = false;
+				}
+
+
+				double num_check=double(i_brand_e-i_brand_b);
+				for(int i=i_brand_b+1;i<i_brand_e;i++){
+					//将品牌最早查看日期找到，并且将查看次数统计出来
+					//由于按时间排序，第一个就是开始日期
+					if(compare(p[i],p[i-1]) == 0){
+						num_check--;
+					}
+				}
+				//计算购买概率{---------------------------------------------------------------
+				double d_x = double(day_gap(8,16,p[i_brand_b].visit_datetime_month,p[i_brand_b].visit_datetime_day));
+				const double c = 0.159155;
+				if(arry_p_b_hbt[1][i_a_p]*arry_p_b_hbt[4][i_a_p] > 0.0000001){
+					//cout<<arry_p_b_hbt[i_a_p][1]<<"\t"<<arry_p_b_hbt[i_a_p][4]<<endl;
+				double P = exp(-0.5*((d_x-arry_p_b_hbt[0][i_a_p])*(d_x-arry_p_b_hbt[0][i_a_p])
+						/(arry_p_b_hbt[1][i_a_p]*arry_p_b_hbt[1][i_a_p])+(num_check-arry_p_b_hbt[3][i_a_p])*(num_check-arry_p_b_hbt[3][i_a_p])
+						/(arry_p_b_hbt[4][i_a_p]*arry_p_b_hbt[4][i_a_p])));
+				P /= (arry_p_b_hbt[1][i_a_p]*arry_p_b_hbt[4][i_a_p]);
+				P *= c;
+
+				if(randoms()<P){
+
+					//扩充
+					if(leng_s_a_b_l[i_a_p] == leng_a_b_l[i_a_p]){
+						int * arry_b_l_copy = new int [leng_a_b_l[i_a_p]];
+						for(int i=0;i<leng_a_b_l[i_a_p];i++){
+							arry_b_l_copy[i] = arry_buy_list[i_a_p][i];
+						}
+						delete [] arry_buy_list[i_a_p];
+						arry_buy_list[i_a_p] = NULL;
+						arry_buy_list[i_a_p] = new int [2*leng_a_b_l[i_a_p]];
+						for(int i=0;i<leng_a_b_l[i_a_p];i++){
+							arry_buy_list[i_a_p][i] = arry_b_l_copy[i];
+						}
+						leng_a_b_l[i_a_p] *= 2;
+						delete [] arry_b_l_copy;
+					}
+
+					arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] = p[i_brand_b].brand_id;
+					cout<<p[i_brand_b].brand_id<<endl;
+					leng_s_a_b_l[i_a_p]++;
+
+				}
+				}
+
+				i_brand_b = i_brand_e;
+				i_brand_e--;
+			}
+
+		}
+		if(leng_s_a_b_l[i_a_p]>0){
+		fout<<arry_person[i_a_p].get_person_id()<<"\t";
+		for(int i=0;i<leng_s_a_b_l[i_a_p];i++){
+			if(i<leng_s_a_b_l[i_a_p]-1){
+			fout<<arry_buy_list[i_a_p][i]<<",";
+			}else{
+				fout<<arry_buy_list[i_a_p][i]<<endl;
+			}
+
+		}
+		}
+
+
+	}
 
 }
 
