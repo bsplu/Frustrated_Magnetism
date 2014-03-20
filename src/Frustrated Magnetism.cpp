@@ -524,6 +524,81 @@ void solution2(person * arry_person_input, int leng_s_arry_person_input) {
 	 * 购买周期和购买周期内查看次数，并且利用这两个值的方差来描述正态分布，计算购买概率
 	 */
 
+	int **arry_buy_list = new int *[leng_s_arry_person];
+	int leng_a_b_l[leng_s_arry_person];
+	//预测将会购买的物品
+	//f(x)=1/(sqrt(2*Pi)*sigma)*exp(-1*(x-miu)^2/(2*sigma^2))
+	//商品是从8月15号开始的预测
+	//x轴的零点是开始查看的日期
+
+	for (int i_a_p = 0; i_a_p < leng_s_arry_person; i_a_p++) {
+
+
+		leng_a_b_l[i_a_p] = 0;
+		arry_buy_list[i_a_p] = new int [200];
+		BuyImformation *p = arry_person[i_a_p].p_buyimformation;
+		//先按id排个序
+		BubbleSort(p, arry_person[i_a_p].leng_s_p_buyim);
+		//test{
+			//看一个人买一个东西后又买一次的可能性
+
+
+		int i_brand_e = 0;
+		int i_brand_b = 0;
+		for(;i_brand_e<arry_person[i_a_p].leng_s_p_buyim;i_brand_e++){
+			if(p[i_brand_b].brand_id != p[i_brand_e].brand_id){
+
+
+				BuyImformation buy[20];
+				int leng_s_buy = 0;
+				for(int i=i_brand_b;i<i_brand_e;i++){
+					if(p[i].type == 1){
+						if(leng_s_buy == 0){
+							buy[leng_s_buy] = p[i];
+							leng_s_buy++;
+						}else{
+							if(abs(day_gap(buy[leng_s_buy-1].visit_datetime_month,buy[leng_s_buy-1].visit_datetime_day,
+									p[i].visit_datetime_month,p[i].visit_datetime_day)) <= 2)
+								continue;
+							else{
+								buy[leng_s_buy] = p[i];
+								leng_s_buy++;
+							}
+						}
+					}
+				}
+
+				if(leng_s_buy >1){
+
+					//粗暴的认为超过两次就有购买周期
+					int T = double(day_gap(buy[leng_s_buy-1].visit_datetime_month,buy[leng_s_buy-1].visit_datetime_day,
+							buy[0].visit_datetime_month,buy[0].visit_datetime_day))/double(leng_s_buy);
+					//看一下下一次购买是否在预测区间内
+					if(day_gap(8,16,buy[leng_s_buy-1].visit_datetime_month,buy[leng_s_buy-1].visit_datetime_day) <= T
+							&& day_gap(9,15,buy[leng_s_buy-1].visit_datetime_month,buy[leng_s_buy-1].visit_datetime_day) > T ){
+						//在预测区间，添加到购买列表中
+						arry_buy_list[i_a_p][leng_a_b_l[i_a_p]] = buy[0].brand_id;
+						leng_a_b_l[i_a_p]++;
+						//删除掉该品牌的全部信息
+						for(int i=i_brand_b;i<i_brand_e;i++){
+							arry_person[i_a_p].delete_one_p_buy(i_brand_b);
+
+						}
+						i_brand_e = i_brand_b;
+					}
+
+				}
+
+				i_brand_b = i_brand_e;
+
+			}
+
+		}
+
+	}
+
+
+
 	const int num_kind_arry_pbhbt = 5;
 	double arry_p_b_hbt[num_kind_arry_pbhbt][leng_s_arry_person];
 	//[0]位储存购买天数平均值，[1]位储存天数标准差，[2]位储存购买个数，[3]查看次数平均值，4为其标准差，
@@ -535,14 +610,7 @@ void solution2(person * arry_person_input, int leng_s_arry_person_input) {
 		}
 
 		BuyImformation * p_bimf_l = arry_person[i_a_p].p_buyimformation;
-		//先按id排个序
-		BubbleSort(p_bimf_l, arry_person[i_a_p].leng_s_p_buyim);
-		/*
-		 for(int i=0;i<arry_person[i_a_p].leng_s_p_buyim;i++){
-		 cout<<p_bimf_l[i].brand_id<<"\t"<<p_bimf_l[i].type<<"\t"<<p_bimf_l[i].visit_datetime_month<<"."<<p_bimf_l[i].visit_datetime_day<<endl;
-		 }
-		 cout<<"======================================="<<endl;
-		 */
+
 
 		for (int i_b = 0; i_b < arry_person[i_a_p].leng_s_p_buyim; i_b++) {
 			if (p_bimf_l[i_b].type == 1) {
@@ -608,70 +676,8 @@ void solution2(person * arry_person_input, int leng_s_arry_person_input) {
 			arry_p_b_hbt[3][i_a_p] /= arry_p_b_hbt[2][i_a_p];
 
 		}
-
-		/*
-		cout << i_a_p + 1 << "\t" << arry_p_b_hbt[2][i_a_p] << "\n\t"
-				<< arry_p_b_hbt[0][i_a_p] << "\t" << arry_p_b_hbt[1][i_a_p]
-				<< endl;
-		cout << "\t" << arry_p_b_hbt[3][i_a_p] << "\t" << arry_p_b_hbt[4][i_a_p]
-				<< endl;
-		cout
-				<< "====================================================================================="
-				<< endl;
-	*/
-
-
 	}
 
-	//预测将会购买的物品
-	//f(x)=1/(sqrt(2*Pi)*sigma)*exp(-1*(x-miu)^2/(2*sigma^2))
-	//商品是从8月15号开始的预测
-	//x轴的零点是开始查看的日期
-	for (int i_a_p = 0; i_a_p < leng_s_arry_person; i_a_p++) {
-		BuyImformation *p = arry_person[i_a_p].p_buyimformation;
-		//test{
-			//看一个人买一个东西后又买一次的可能性
-
-		int i_brand_e = 0;
-		int i_brand_b = 0;
-
-		for(;i_brand_e<arry_person[i_a_p].leng_s_p_buyim;i_brand_e++){
-			if(p[i_brand_b].brand_id != p[i_brand_e].brand_id){
-				BuyImformation buy;
-				int num_buy(0);
-				for(int i=i_brand_b;i<i_brand_e;i++){
-					if(p[i].type == 1){
-						if(num_buy == 0){
-							num_buy ++;
-							buy = p[i];
-						}else{
-							if(compare(buy,p[i]) == 0)
-								continue;
-							else{
-								num_buy++;
-
-							}
-						}
-					}
-				}
-
-				if(num_buy >1){
-					cout<<num_buy<<endl;
-					for(int i=i_brand_b;i<i_brand_e;i++){
-						if(p[i].type == 1)
-							cout<<p[i].visit_datetime_month<<"."<<p[i].visit_datetime_day<<endl;
-					}
-					cout<<"===============================\n";
-				}
-
-				i_brand_b = i_brand_e;
-				break;
-			}
-
-		}
-
-		//发现确实有人会隔一段时间海通一个商品
-	}
 
 }
 
