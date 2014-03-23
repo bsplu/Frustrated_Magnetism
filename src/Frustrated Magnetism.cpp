@@ -848,3 +848,8 @@ int compare(BuyImformation a, BuyImformation b) {
 		return -2;
 	}
 }
+
+void score(void)
+{
+
+}
