@@ -525,8 +525,8 @@ void solution2(person * arry_person_input, int leng_s_arry_person_input) {
 	 */
 
 	int **arry_buy_list = new int *[leng_s_arry_person];
-	int leng_s_a_b_l[leng_s_arry_person];
-	int leng_a_b_l[leng_s_arry_person];
+	int *leng_s_a_b_l=new int [leng_s_arry_person];
+	int *leng_a_b_l = new int [leng_s_arry_person];
 
 
 	for (int i_a_p = 0; i_a_p < leng_s_arry_person; i_a_p++) {
@@ -608,9 +608,13 @@ void solution2(person * arry_person_input, int leng_s_arry_person_input) {
 	}
 
 	const int num_kind_arry_pbhbt = 5;
-	double arry_p_b_hbt[num_kind_arry_pbhbt][leng_s_arry_person];
+	double *arry_p_b_hbt[num_kind_arry_pbhbt];
+	for(int i=0;i<num_kind_arry_pbhbt;i++){
+		arry_p_b_hbt[i] = new double [leng_s_arry_person];
+	}
 	//[0]位储存购买天数平均值，[1]位储存天数标准差，[2]位储存购买个数，[3]查看次数平均值，4为其标准差，
 	for (int i_a_p = 0; i_a_p < leng_s_arry_person; i_a_p++) {
+
 
 		for (int i = 0; i < num_kind_arry_pbhbt; i++) {
 			arry_p_b_hbt[i][i_a_p] = 0;
