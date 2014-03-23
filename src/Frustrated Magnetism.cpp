@@ -689,6 +689,9 @@ void solution2(person * arry_person_input, int leng_s_arry_person_input) {
 	//f(x)=1/(sqrt(2*Pi)*sigma)*exp(-1*(x-miu)^2/(2*sigma^2))
 	//商品是从8月15号开始的预测
 	//x轴的零点是开始查看的日期
+
+	double total = 0;
+	double acc = 0;
 	for (int i_a_p = 0; i_a_p < leng_s_arry_person; i_a_p++) {
 
 		BuyImformation *p = arry_person[i_a_p].p_buyimformation;
@@ -736,18 +739,21 @@ void solution2(person * arry_person_input, int leng_s_arry_person_input) {
 					}
 				}
 				//计算购买概率{---------------------------------------------------------------
+
 				double d_x = double(day_gap(8,16,p[i_brand_b].visit_datetime_month,p[i_brand_b].visit_datetime_day));
 				const double c = 0.159155;
 				if(arry_p_b_hbt[1][i_a_p]*arry_p_b_hbt[4][i_a_p] > 0.0000001){
+					total ++;
 					//cout<<arry_p_b_hbt[i_a_p][1]<<"\t"<<arry_p_b_hbt[i_a_p][4]<<endl;
 				double P = exp(-0.5*((d_x-arry_p_b_hbt[0][i_a_p])*(d_x-arry_p_b_hbt[0][i_a_p])
 						/(arry_p_b_hbt[1][i_a_p]*arry_p_b_hbt[1][i_a_p])+(num_check-arry_p_b_hbt[3][i_a_p])*(num_check-arry_p_b_hbt[3][i_a_p])
 						/(arry_p_b_hbt[4][i_a_p]*arry_p_b_hbt[4][i_a_p])));
+
 				P /= (arry_p_b_hbt[1][i_a_p]*arry_p_b_hbt[4][i_a_p]);
 				P *= c;
 
-				if(randoms()<P){
-
+				if(randoms()<500*P){
+					acc++;
 					//扩充
 					if(leng_s_a_b_l[i_a_p] == leng_a_b_l[i_a_p]){
 						int * arry_b_l_copy = new int [leng_a_b_l[i_a_p]];
@@ -765,10 +771,14 @@ void solution2(person * arry_person_input, int leng_s_arry_person_input) {
 					}
 
 					arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] = p[i_brand_b].brand_id;
-					cout<<p[i_brand_b].brand_id<<endl;
+					//cout<<p[i_brand_b].brand_id<<endl;
 					leng_s_a_b_l[i_a_p]++;
 
+				}else{
+					cout<<i_a_p<<"\t"<<P<<endl;
 				}
+				}else{
+					//cout<<i_a_p<<"\t"<<arry_p_b_hbt[2][i_a_p]<<"\t"<<arry_p_b_hbt[2][i_a_p]<<"!"<<endl;
 				}
 
 				i_brand_b = i_brand_e;
@@ -790,7 +800,7 @@ void solution2(person * arry_person_input, int leng_s_arry_person_input) {
 
 
 	}
-
+	cout<<"接受率"<<acc/total<<endl;
 }
 
 void BubbleSort(BuyImformation * pData, int Count) {
