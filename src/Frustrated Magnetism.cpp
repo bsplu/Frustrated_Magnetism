@@ -1285,10 +1285,10 @@ double* score(int ** arry1, int *len_arry1_ev, int len_arry1, int ** arry2, int 
 	for (size_t i = 0; i < hitu; i++)
 	//遍历所有命中用户，此时i代表hituser1/2中的序号，hituser1/2[i]代表user id在1，2中的序号
 	{
-		for (size_t j = 0; j < len_arry1_ev[hituser1[i]]; j++)
+		for (size_t j = 1; j < len_arry1_ev[hituser1[i]]; j++)
 		//遍历某命中用户的预测品牌
 		{
-			for (size_t k = 0; k < len_arry2_ev[hituser2[i]]; k++)
+			for (size_t k = 1; k < len_arry2_ev[hituser2[i]]; k++)
 			//比较预测品牌和所有实际品牌
 			{
 				if (arry1[hituser1[i]][j] == arry2[hituser2[i]][k])
@@ -1302,13 +1302,13 @@ double* score(int ** arry1, int *len_arry1_ev, int len_arry1, int ** arry2, int 
 	for (size_t i = 0; i < len_arry1; i++)
 	//计算命中数
 	{
-		pBrand += len_arry1_ev[i];
+		pBrand += len_arry1_ev[i]-1;
 	}
 
 	for (size_t i = 0; i < len_arry2; i++)
 	//计算召回数
 	{
-		bBrand += len_arry2_ev[i];
+		bBrand += len_arry2_ev[i]-1;
 	}
 
 	prst[0] = static_cast<double> (hit / pBrand);
@@ -1317,6 +1317,9 @@ double* score(int ** arry1, int *len_arry1_ev, int len_arry1, int ** arry2, int 
 	//召回率
 	prst[2] = static_cast<double>(2 * prst[0] * prst[1] / (prst[0] + prst[1]));
 	//得分
+
+	delete [] hituser1;
+	delete [] hituser2;
 
 	return prst;
 }
