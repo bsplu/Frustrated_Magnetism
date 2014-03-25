@@ -298,6 +298,68 @@ void chose_buy_from_day(int b_month, int b_day,int e_month,int e_day,person * ar
 	delete [] len_a_b_l_re;
 }
 
+void chose_pa_from_day(int b_month, int b_day,int e_month,int e_day,person * arry_in,int len_arry_in,
+		int ** &arry_buy_list,int &len_arry_buy_list,int *&len_arry_buy_list_ev){
+
+	len_arry_buy_list = 0;
+	int *len_a_b_l_re = new int [len_arry_in];//储存arry_buy_list实际每一行的声明长度
+	for(int i=0;i<len_arry_in;i++){
+		len_a_b_l_re[i] = 100;
+	}
+
+	arry_buy_list = new int * [len_arry_in];
+	len_arry_buy_list_ev = new int [len_arry_in];
+	for(int i=0;i<len_arry_in;i++){
+		arry_buy_list[i] = new int [len_a_b_l_re[i]];
+		len_arry_buy_list_ev[i] = 0;
+	}
+
+	for(int i=0;i<len_arry_in;i++){
+		for(int j=0;j<arry_in[i].leng_p_buyim;j++){
+			BuyImformation com_local_b;
+			com_local_b.visit_datetime_month = b_month;
+			com_local_b.visit_datetime_day = b_day;
+			BuyImformation com_local_e;
+						com_local_e.visit_datetime_month = e_month;
+						com_local_e.visit_datetime_day = e_day;
+			//如果日期大于选择开始日期，并且type==1则加入购买名单
+			if(compare(com_local_b,arry_in[i].p_buyimformation[j]) <0 && compare(com_local_e,arry_in[i].p_buyimformation[j]) >0 && arry_in[i].p_buyimformation[j].type == 2){
+				//如果len_arry_buy_list_ev[len_arry_buy_list]为0,说明还没有储存user——id，先储存user_id
+				if(len_arry_buy_list_ev[len_arry_buy_list] == 0){
+					arry_buy_list[len_arry_buy_list][0] = arry_in[i].get_person_id();
+					arry_buy_list[len_arry_buy_list][1] = arry_in[i].p_buyimformation[j].brand_id;
+					len_arry_buy_list_ev[len_arry_buy_list] = 2;
+				}else{
+					arry_buy_list[len_arry_buy_list][len_arry_buy_list_ev[len_arry_buy_list]] = arry_in[i].p_buyimformation[j].brand_id;
+					len_arry_buy_list_ev[len_arry_buy_list] ++;
+
+					//判断是否需要扩容
+					if(len_arry_buy_list_ev[len_arry_buy_list] == len_a_b_l_re[len_arry_buy_list]){
+						int * cp_buy = new int [len_a_b_l_re[len_arry_buy_list]];
+						for(int i_cp=0;i_cp<len_a_b_l_re[len_arry_buy_list];i_cp++){
+							cp_buy[i_cp] = arry_buy_list[len_arry_buy_list][i_cp];
+						}
+						delete [] arry_buy_list[len_arry_buy_list];
+						arry_buy_list[len_arry_buy_list] = NULL;
+						arry_buy_list[len_arry_buy_list] = new int [len_a_b_l_re[len_arry_buy_list]*2];
+						for(int i_cp=0;i_cp<len_a_b_l_re[len_arry_buy_list];i_cp++){
+							arry_buy_list[len_arry_buy_list][i_cp] = cp_buy[i_cp];
+						}
+						len_a_b_l_re[len_arry_buy_list] *= 2;
+						delete [] cp_buy;
+					}
+
+				}
+			}
+		}
+
+		if(len_arry_buy_list_ev[len_arry_buy_list] != 0){
+			len_arry_buy_list++;
+		}
+	}
+
+	delete [] len_a_b_l_re;
+}
 
 
 
@@ -308,6 +370,8 @@ int main() {
 			int f_m_e=9,int f_d_e=15);
 	void solution3(person * arry_person_input, int leng_s_arry_person_input,int f_m_b=8,int f_d_b=16,
 			int f_m_e=9,int f_d_e=15);
+	void solution4(person * arry_person_input, int leng_s_arry_person_input,int f_m_b=8,int f_d_b=16,
+			int f_m_e=9,int f_d_e=15);
 	srand((unsigned) time(NULL));
 	person * arry_person = NULL;
 	int leng_s_arry_person = 0;
@@ -317,8 +381,8 @@ int main() {
 	read_txt(arry_person, leng_s_arry_person);
 
 
-	//solution2(arry_person, leng_s_arry_person,7,16,8,15);
-	solution3(arry_person, leng_s_arry_person,7,16,8,15);
+	solution4(arry_person, leng_s_arry_person,7,16,8,15);
+	//solution3(arry_person, leng_s_arry_person,7,16,8,15);
 
 
 	return 0;
@@ -449,8 +513,8 @@ void read_txt(person* &arry_person_inpute, int & leng_s_arry_person) {
 								&& p_buyim_local.p_buyimformation[i].visit_datetime_month
 										== buymonth
 								&& p_buyim_local.p_buyimformation[i].visit_datetime_day == buyday
-								&& p_buyim_local.p_buyimformation[i].type == 0) {
-							//满足同天购买查看条件，将该条删除
+								&& (p_buyim_local.p_buyimformation[i].type == 0 || p_buyim_local.p_buyimformation[i].type == 3 )  ) {
+							//满足同天购买 查看加购物车条件，将该条删除
 
 							arry_person[leng_s_arry_person - 2].delete_one_p_buy(
 									i);
@@ -829,12 +893,9 @@ void solution2(person * arry_person_input, int leng_s_arry_person_input,int f_m_
 				arry_p_b_hbt[0][i_a_p] += double(day_gap_value);
 				arry_p_b_hbt[1][i_a_p] += double(day_gap_value * day_gap_value);
 				arry_p_b_hbt[2][i_a_p] += 1.0;
-				/*
-				 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-				 * 发现num_check_rel包含了单天查看多次信息，没有删掉，与之前构想不同
-				 * 忘删了！！！！！！shit
-				 */
 
+				double num_check_rel = (double(i_b)-double(i_b_b_l))/double(day_gap_value);
+				/*
 				double num_check_rel = 0.;
 				for(int i=i_b_b_l+1;i<i_b;i++){
 					if(compare(p_bimf_l.p_buyimformation[i],p_bimf_l.p_buyimformation[i-1])==0)
@@ -843,6 +904,7 @@ void solution2(person * arry_person_input, int leng_s_arry_person_input,int f_m_
 						num_check_rel++;
 				}
 				num_check_rel/=double(day_gap_value);
+				*/
 				arry_p_b_hbt[3][i_a_p] += num_check_rel;
 				arry_p_b_hbt[4][i_a_p] += num_check_rel * num_check_rel;
 
@@ -936,12 +998,17 @@ void solution2(person * arry_person_input, int leng_s_arry_person_input,int f_m_
 				if(arry_p_b_hbt[1][i_a_p]*arry_p_b_hbt[4][i_a_p] > 0.0000001){
 					total ++;
 					//cout<<arry_p_b_hbt[i_a_p][1]<<"\t"<<arry_p_b_hbt[i_a_p][4]<<endl;
+
+
+
 				double P = exp(-0.5*((d_x-arry_p_b_hbt[0][i_a_p])*(d_x-arry_p_b_hbt[0][i_a_p])
 						/(arry_p_b_hbt[1][i_a_p]*arry_p_b_hbt[1][i_a_p])+(num_check-arry_p_b_hbt[3][i_a_p])*(num_check-arry_p_b_hbt[3][i_a_p])
 						/(arry_p_b_hbt[4][i_a_p]*arry_p_b_hbt[4][i_a_p])));
 
 				P /= (arry_p_b_hbt[1][i_a_p]*arry_p_b_hbt[4][i_a_p]);
 				P *= c;
+
+
 
 				if(randoms()<P){
 					acc++;
@@ -1042,7 +1109,8 @@ void solution2(person * arry_person_input, int leng_s_arry_person_input,int f_m_
 
 
 void solution3(person * arry_person_input, int leng_s_arry_person_input,int f_m_b=8,int f_d_b=16,
-		int f_m_e=9,int f_d_e=15){
+		int f_m_e=9,int f_d_e=15) {
+
 	person * arry_person = new person[leng_s_arry_person_input];
 	int leng_s_arry_person = leng_s_arry_person_input;
 	for (int i = 0; i < leng_s_arry_person; i++) {
@@ -1050,6 +1118,24 @@ void solution3(person * arry_person_input, int leng_s_arry_person_input,int f_m_
 		arry_person[i].delete_by_day(f_m_b,f_d_b);
 	}
 
+
+	//我们认为一个人在买完一个商品连续的时间内查看商品的信息是对购买信息没有帮助的，应当删除
+	/*测试出用户的购买习惯:
+	 * 1.购买考察期：一个用户在购买前，一般会提前多少天开始购买
+	 * 2.考察频率，强度：用户在考察一个商品时，大致多长时间会浏览一次商品，以及用户在考察时单天考察次数
+	 *
+	 * 具体刻画方法：
+	 * 1.存在考察周期d
+	 * 2.考察强度平均值：考察总次数/考察周期
+	 * 3.考察强度方差：为考察强度平均值的方差，反应单天考察强度
+	 * 4.考察平均值：考察时间距购买时间的平均值
+	 */
+
+	/*
+	 * 2014/3/18
+	 * 现改变想法，仅用两个值来刻画
+	 * 购买周期和购买周期内查看次数，并且利用这两个值的方差来描述正态分布，计算购买概率
+	 */
 
 	int **arry_buy_list = new int *[leng_s_arry_person];
 	int *leng_s_a_b_l=new int [leng_s_arry_person];
@@ -1059,65 +1145,389 @@ void solution3(person * arry_person_input, int leng_s_arry_person_input,int f_m_
 	for (int i_a_p = 0; i_a_p < leng_s_arry_person; i_a_p++) {
 
 		leng_s_a_b_l[i_a_p] = 0;
-		leng_a_b_l[i_a_p] = arry_person[i_a_p].leng_s_p_buyim;
+		leng_a_b_l[i_a_p] = 200;
 		arry_buy_list[i_a_p] = new int[leng_a_b_l[i_a_p]];
 		person &p = arry_person[i_a_p];
 		//先按id排个序
 		BubbleSort(p.p_buyimformation, arry_person[i_a_p].leng_s_p_buyim);
+		//test{
+		//看一个人买一个东西后又买一次的可能性
 
-		for(int i=1;i<p.leng_s_p_buyim;i++){
-			if(p.p_buyimformation[i].brand_id != p.p_buyimformation[i-1].brand_id){
-				arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] = p.p_buyimformation[i].brand_id;
-				leng_s_a_b_l[i_a_p]++;
-			}
-		}
+		int i_brand_e = 0;
+		int i_brand_b = 0;
+		for (; i_brand_e < arry_person[i_a_p].leng_s_p_buyim; i_brand_e++) {
+			if (p.p_buyimformation[i_brand_b].brand_id != p.p_buyimformation[i_brand_e].brand_id) {
 
-
-
-	}
-
-
-	int ** arry1;
-	int * len_arry1_ev = NULL;
-	int len_arry1 =0;
-	//现判断一下len_arry1的大小
-	for(int i=0;i<leng_s_arry_person;i++){
-		if(leng_s_a_b_l[i]>0){
-			len_arry1++;
-		}
-	}
-	arry1 = new int *[len_arry1];
-	len_arry1_ev = new int [len_arry1];
-	int i_arry_buy_list = 0;
-	for(int i=0;i<len_arry1;i++){
-		len_arry1_ev[i] = 0;
-		for(;i_arry_buy_list<leng_s_arry_person;i_arry_buy_list++){
-			if(leng_s_a_b_l[i_arry_buy_list] > 0){
-				len_arry1_ev[i] = leng_s_a_b_l[i_arry_buy_list]+1;
-				arry1[i] = new int [leng_s_a_b_l[i_arry_buy_list]+1];
-				arry1[i][0] = arry_person[i_arry_buy_list].get_person_id();
-
-				for(int j=0;j<leng_s_a_b_l[i_arry_buy_list];j++){
-					arry1[i][j+1] = arry_buy_list[i_arry_buy_list][j];
+				BuyImformation buy[20];
+				int leng_s_buy = 0;
+				for (int i = i_brand_b; i < i_brand_e; i++) {
+					if (p.p_buyimformation[i].type == 1) {
+						if (leng_s_buy == 0) {
+							buy[leng_s_buy] = p.p_buyimformation[i];
+							leng_s_buy++;
+						} else {
+							if (abs(
+									day_gap(
+											buy[leng_s_buy - 1].visit_datetime_month,
+											buy[leng_s_buy - 1].visit_datetime_day,
+											p.p_buyimformation[i].visit_datetime_month,
+											p.p_buyimformation[i].visit_datetime_day)) <= 2)
+								continue;
+							else {
+								buy[leng_s_buy] = p.p_buyimformation[i];
+								leng_s_buy++;
+							}
+						}
+					}
 				}
-				i_arry_buy_list++;
-				break;
+
+				if (leng_s_buy > 1) {
+					//粗暴的认为超过两次就有购买周期
+					int T = double(
+							day_gap(buy[leng_s_buy - 1].visit_datetime_month,
+									buy[leng_s_buy - 1].visit_datetime_day,
+									buy[0].visit_datetime_month,
+									buy[0].visit_datetime_day))
+							/ double(leng_s_buy);
+					//看一下下一次购买是否在预测区间内
+					if (day_gap(f_m_b, f_d_b, buy[leng_s_buy - 1].visit_datetime_month,
+							buy[leng_s_buy - 1].visit_datetime_day) <= T
+							&& day_gap(f_m_e, f_d_e,
+									buy[leng_s_buy - 1].visit_datetime_month,
+									buy[leng_s_buy - 1].visit_datetime_day)
+									> T) {
+						//在预测区间，添加到购买列表中
+						arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
+								buy[0].brand_id;
+						leng_s_a_b_l[i_a_p]++;
+						//删除掉该品牌的全部信息
+						for (int i = i_brand_b; i < i_brand_e; i++) {
+							arry_person[i_a_p].delete_one_p_buy(i_brand_b);
+						}
+						i_brand_e = i_brand_b;
+					}
+
+				}
+
+				i_brand_b = i_brand_e;
+				i_brand_e--;
+
 			}
+
+		}
+
+	}
+
+
+	const int num_kind_arry_pbhbt = 5;
+	double *arry_p_b_hbt[num_kind_arry_pbhbt];
+	for(int i=0;i<num_kind_arry_pbhbt;i++){
+		arry_p_b_hbt[i] = new double [leng_s_arry_person];
+	}
+	//[0]位储存购买天数平均值，[1]位储存天数标准差，[2]位储存购买个数，[3]查看次数平均值，4为其标准差，
+	for (int i_a_p = 0; i_a_p < leng_s_arry_person; i_a_p++) {
+
+
+		for (int i = 0; i < num_kind_arry_pbhbt; i++) {
+			arry_p_b_hbt[i][i_a_p] = 0;
+
+		}
+
+		person & p_bimf_l = arry_person[i_a_p];
+
+		for (int i_b = 0; i_b < arry_person[i_a_p].leng_s_p_buyim; i_b++) {
+			if (p_bimf_l.p_buyimformation[i_b].type == 1) {
+				BuyImformation b_local;
+				b_local = p_bimf_l.p_buyimformation[i_b];
+				//检查之前是否购买过同个商品
+
+				int i_b_b = i_b - 1;	//运行后刚好是一个brand_id的起始位置
+				int i_b_b_l = 0;
+				for (;
+						(p_bimf_l.p_buyimformation[i_b_b].brand_id == b_local.brand_id
+								&& i_b_b >= 0); i_b_b--) {
+					if (p_bimf_l.p_buyimformation[i_b_b].type == 1) {
+
+						i_b_b_l = i_b_b;
+					}
+				}
+				i_b_b_l = i_b_b_l == 0 ? i_b_b + 1 : i_b_b_l + 1;
+
+				//开始记录平均值
+				int day_gap_value = day_gap(p_bimf_l.p_buyimformation[i_b].visit_datetime_month,
+						p_bimf_l.p_buyimformation[i_b].visit_datetime_day,
+						p_bimf_l.p_buyimformation[i_b_b_l].visit_datetime_month,
+						p_bimf_l.p_buyimformation[i_b_b_l].visit_datetime_day);
+				if (day_gap_value < 0)
+					exit(0);
+				if (day_gap_value == 0)
+					continue;
+				//cout<<day_gap_value<<endl;
+
+				arry_p_b_hbt[0][i_a_p] += double(day_gap_value);
+				arry_p_b_hbt[1][i_a_p] += double(day_gap_value * day_gap_value);
+				arry_p_b_hbt[2][i_a_p] += 1.0;
+
+				double num_check_rel = (double(i_b)-double(i_b_b_l))/double(day_gap_value);
+				/*
+				double num_check_rel = 0.;
+				for(int i=i_b_b_l+1;i<i_b;i++){
+					if(compare(p_bimf_l.p_buyimformation[i],p_bimf_l.p_buyimformation[i-1])==0)
+						continue;
+					else
+						num_check_rel++;
+				}
+				num_check_rel/=double(day_gap_value);
+				*/
+				arry_p_b_hbt[3][i_a_p] += num_check_rel;
+				arry_p_b_hbt[4][i_a_p] += num_check_rel * num_check_rel;
+
+			}
+		}
+
+		if (arry_p_b_hbt[2][i_a_p] != 0) {
+			if (arry_p_b_hbt[2][i_a_p] != 1) {
+				arry_p_b_hbt[1][i_a_p] = sqrt(
+						arry_p_b_hbt[1][i_a_p] / arry_p_b_hbt[2][i_a_p]
+								- arry_p_b_hbt[0][i_a_p]
+										* arry_p_b_hbt[0][i_a_p]
+										/ (arry_p_b_hbt[2][i_a_p]
+												* arry_p_b_hbt[2][i_a_p]));
+				arry_p_b_hbt[4][i_a_p] = sqrt(
+						arry_p_b_hbt[4][i_a_p] / arry_p_b_hbt[2][i_a_p]
+								- arry_p_b_hbt[3][i_a_p]
+										* arry_p_b_hbt[3][i_a_p]
+										/ (arry_p_b_hbt[2][i_a_p]
+												* arry_p_b_hbt[2][i_a_p]));
+			} else {
+				arry_p_b_hbt[1][i_a_p] = 0;
+				arry_p_b_hbt[4][i_a_p] = 0;
+			}
+
+			arry_p_b_hbt[0][i_a_p] /= arry_p_b_hbt[2][i_a_p];
+			arry_p_b_hbt[3][i_a_p] /= arry_p_b_hbt[2][i_a_p];
+
 		}
 	}
 
-	int ** arry2;
-	int * len_arry2_ev = NULL;
-	int len_arry2 =0;
+	ofstream fout("solution2.txt");
+	//预测将会购买的物品
+	//f(x)=1/(sqrt(2*Pi)*sigma)*exp(-1*(x-miu)^2/(2*sigma^2))
+	//商品是从8月15号开始的预测
+	//x轴的零点是开始查看的日期
 
-	chose_buy_from_day(f_m_b,f_d_b,f_m_e,f_d_e,arry_person_input,leng_s_arry_person_input,arry2,len_arry2,len_arry2_ev);
+	double total = 0;
+	double acc = 0;
+	for (int i_a_p = 0; i_a_p < leng_s_arry_person; i_a_p++) {
+
+		person & p = arry_person[i_a_p];
+
+		int i_brand_e = 0;
+		int i_brand_b = 0;
+		BuyImformation buy_local;
+		bool ifbuy = false;
+		for (; i_brand_e < arry_person[i_a_p].leng_s_p_buyim; i_brand_e++) {
 
 
-	double * value_score = NULL;
-	value_score = score(arry1,len_arry1_ev,len_arry1,arry2,len_arry2_ev,len_arry2);
-	cout<<value_score[0]*100.0<<"%\t"<<value_score[1]*100.0<<"%\t"<<value_score[2]*100.0<<"%"<<endl;
+			//我们认为在4个月的时间内，买过一个物品后段时间之内是不会再买该物品的，将买过的物品买后一个月到第一次查看的信息清除
+			if(p.p_buyimformation[i_brand_e].type == 1 && p.p_buyimformation[i_brand_b].brand_id == p.p_buyimformation[i_brand_e].brand_id){
+				ifbuy = true;
+				buy_local = p.p_buyimformation[i_brand_e];
+			}
+
+			if (p.p_buyimformation[i_brand_b].brand_id != p.p_buyimformation[i_brand_e].brand_id) {
+
+				if(ifbuy){
+					//删除该物品购买后一个月内及购买前的全部信息
+					int i=0;
+					int gap_local = i_brand_e-i_brand_b;
+					for(;i<gap_local;i++){
+						if(day_gap(p.p_buyimformation[i+i_brand_b].visit_datetime_month,p.p_buyimformation[i+i_brand_b].visit_datetime_day,
+								buy_local.visit_datetime_month,buy_local.visit_datetime_day) < 30){
+							arry_person[i_a_p].delete_one_p_buy(i_brand_b);
+							p.p_buyimformation = arry_person[i_a_p].p_buyimformation;
+						}else{
+							i++;
+							break;
+						}
+					}
+					i_brand_e -= i;
+
+					ifbuy = false;
+				}
 
 
+				double num_check=double(i_brand_e-i_brand_b);
+				/*
+				for(int i=i_brand_b+1;i<i_brand_e;i++){
+					//将品牌最早查看日期找到，并且将查看次数统计出来
+					//由于按时间排序，第一个就是开始日期
+					if(compare(p.p_buyimformation[i],p.p_buyimformation[i-1]) == 0){
+						num_check--;
+					}
+				}
+				*/
+				//计算购买概率{---------------------------------------------------------------
+
+				double d_x = double(day_gap(f_m_b,f_d_b,p.p_buyimformation[i_brand_b].visit_datetime_month,p.p_buyimformation[i_brand_b].visit_datetime_day));
+				const double c = 0.159155;
+				if(arry_p_b_hbt[1][i_a_p]*arry_p_b_hbt[4][i_a_p] > 0.0000001){
+					total ++;
+					//cout<<arry_p_b_hbt[i_a_p][1]<<"\t"<<arry_p_b_hbt[i_a_p][4]<<endl;
+
+
+
+				double P = exp(-0.5*((d_x-arry_p_b_hbt[0][i_a_p])*(d_x-arry_p_b_hbt[0][i_a_p])
+						/(arry_p_b_hbt[1][i_a_p]*arry_p_b_hbt[1][i_a_p])+(num_check-arry_p_b_hbt[3][i_a_p])*(num_check-arry_p_b_hbt[3][i_a_p])
+						/(arry_p_b_hbt[4][i_a_p]*arry_p_b_hbt[4][i_a_p])));
+
+				P /= (arry_p_b_hbt[1][i_a_p]*arry_p_b_hbt[4][i_a_p]);
+				P *= c;
+
+
+					//double P = arry_p_b_hbt[4][i_a_p]/arry_p_b_hbt[3][i_a_p];
+
+
+
+				//if(P<1.2 && arry_p_b_hbt[3][i_a_p]*d_x < num_check*10./8.){
+				if(randoms()<P){
+					acc++;
+					//扩充
+					if(leng_s_a_b_l[i_a_p] == leng_a_b_l[i_a_p]){
+						int * arry_b_l_copy = new int [leng_a_b_l[i_a_p]];
+						for(int i=0;i<leng_a_b_l[i_a_p];i++){
+							arry_b_l_copy[i] = arry_buy_list[i_a_p][i];
+						}
+						delete [] arry_buy_list[i_a_p];
+						arry_buy_list[i_a_p] = NULL;
+						arry_buy_list[i_a_p] = new int [2*leng_a_b_l[i_a_p]];
+						for(int i=0;i<leng_a_b_l[i_a_p];i++){
+							arry_buy_list[i_a_p][i] = arry_b_l_copy[i];
+						}
+						leng_a_b_l[i_a_p] *= 2;
+						delete [] arry_b_l_copy;
+					}
+
+					arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] = p.p_buyimformation[i_brand_b].brand_id;
+					//cout<<p[i_brand_b].brand_id<<endl;
+					leng_s_a_b_l[i_a_p]++;
+
+				}else{
+					//cout<<i_a_p<<"\t"<<P<<endl;
+				}
+				}else{
+					//cout<<i_a_p<<"\t"<<arry_p_b_hbt[2][i_a_p]<<"\t"<<arry_p_b_hbt[2][i_a_p]<<"!"<<endl;
+				}
+
+				i_brand_b = i_brand_e;
+				i_brand_e--;
+			}
+
+		}
+		if(leng_s_a_b_l[i_a_p]>0){
+		fout<<arry_person[i_a_p].get_person_id()<<"\t";
+		for(int i=0;i<leng_s_a_b_l[i_a_p];i++){
+			if(i<leng_s_a_b_l[i_a_p]-1){
+			fout<<arry_buy_list[i_a_p][i]<<",";
+			}else{
+				fout<<arry_buy_list[i_a_p][i]<<endl;
+			}
+
+		}
+		}
+
+
+	}
+	cout<<"接受率"<<acc/total<<endl;
+
+	if(!(f_m_b == 8 && f_d_b == 16)){
+		//启动本地预判分系统
+		int ** arry1;
+		int * len_arry1_ev = NULL;
+		int len_arry1 =0;
+		//现判断一下len_arry1的大小
+		for(int i=0;i<leng_s_arry_person;i++){
+			if(leng_s_a_b_l[i]>0){
+				len_arry1++;
+			}
+		}
+		arry1 = new int *[len_arry1];
+		len_arry1_ev = new int [len_arry1];
+		int i_arry_buy_list = 0;
+		for(int i=0;i<len_arry1;i++){
+			len_arry1_ev[i] = 0;
+			for(;i_arry_buy_list<leng_s_arry_person;i_arry_buy_list++){
+				if(leng_s_a_b_l[i_arry_buy_list] > 0){
+					len_arry1_ev[i] = leng_s_a_b_l[i_arry_buy_list]+1;
+					arry1[i] = new int [leng_s_a_b_l[i_arry_buy_list]+1];
+					arry1[i][0] = arry_person[i_arry_buy_list].get_person_id();
+
+					for(int j=0;j<leng_s_a_b_l[i_arry_buy_list];j++){
+						arry1[i][j+1] = arry_buy_list[i_arry_buy_list][j];
+					}
+					i_arry_buy_list++;
+					break;
+				}
+			}
+		}
+
+
+		int ** arry2;
+		int * len_arry2_ev = NULL;
+		int len_arry2 =0;
+
+		chose_buy_from_day(f_m_b,f_d_b,f_m_e,f_d_e,arry_person_input,leng_s_arry_person_input,arry2,len_arry2,len_arry2_ev);
+
+
+		double * value_score = NULL;
+		value_score = score(arry1,len_arry1_ev,len_arry1,arry2,len_arry2_ev,len_arry2);
+		cout<<value_score[0]*100.0<<"%\t"<<value_score[1]*100.0<<"%\t"<<value_score[2]*100.0<<"%"<<endl;
+
+
+	}
+}
+
+void solution4(person * arry_person_input, int leng_s_arry_person_input,int f_m_b=8,int f_d_b=16,
+		int f_m_e=9,int f_d_e=15){
+	person * arry_person = new person[leng_s_arry_person_input];
+		int leng_s_arry_person = leng_s_arry_person_input;
+		for (int i = 0; i < leng_s_arry_person; i++) {
+			arry_person[i] = arry_person_input[i];
+			arry_person[i].delete_by_day(f_m_b,f_d_b);
+		}
+
+		int **arry_buy_list = new int *[leng_s_arry_person];
+		int *leng_s_a_b_l=new int [leng_s_arry_person];
+		int *leng_a_b_l = new int [leng_s_arry_person];
+
+
+		for (int i_a_p = 0; i_a_p < leng_s_arry_person; i_a_p++) {
+
+			leng_s_a_b_l[i_a_p] = 0;
+			leng_a_b_l[i_a_p] = 200;
+			arry_buy_list[i_a_p] = new int[leng_a_b_l[i_a_p]];
+			person &p = arry_person[i_a_p];
+			//先按id排个序
+			BubbleSort(p.p_buyimformation, arry_person[i_a_p].leng_s_p_buyim);
+
+
+		}
+		int ** arry1;
+		int * len_arry1_ev = NULL;
+		int len_arry1 =0;
+
+		chose_pa_from_day(6,16,7,15,arry_person_input,leng_s_arry_person_input,arry1,len_arry1,len_arry1_ev);
+
+		int ** arry2;
+			int * len_arry2_ev = NULL;
+			int len_arry2 =0;
+
+			chose_buy_from_day(f_m_b,f_d_b,f_m_e,f_d_e,arry_person_input,leng_s_arry_person_input,arry2,len_arry2,len_arry2_ev);
+//f_m_b,f_d_b,f_m_e,f_d_e
+
+			double * value_score = NULL;
+			value_score = score(arry1,len_arry1_ev,len_arry1,arry2,len_arry2_ev,len_arry2);
+			cout<<value_score[0]*100.0<<"%\t"<<value_score[1]*100.0<<"%\t"<<value_score[2]*100.0<<"%"<<endl;
 
 }
 
