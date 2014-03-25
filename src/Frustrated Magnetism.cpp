@@ -1251,7 +1251,72 @@ int compare(BuyImformation a, BuyImformation b) {
 
 
 
-void score(void)
+double* score(int ** arry1, int *len_arry1_ev, int len_arry1, int ** arry2, int *len_arry2_ev, int len_arry2)
+//返回一个3位数组的指针，第一位是命中率，第二位是召回率，第三位是分数，都是double型
 {
+	int hit = 0,hitu=0;
+	//hit存储品牌命中数，hitu存储命中用户数
 
+	int pBrand = 0, bBrand = 0;
+	//pBrand存储预测品牌总数，bBrand存储实际品牌总数
+
+	int* hituser1 = new int[len_arry1];
+	//hituser存储命中用户在1中的序号，不是id
+
+	int* hituser2 = new int[len_arry1];
+	//hituser存储命中用户在2中的序号，不是id
+
+	double* prst=new double[3];
+
+	for (size_t i = 0; i < len_arry1; i++)
+	//遍历1
+	{
+		for (size_t j = 0; j < len_arry2; j++)
+		//每个1与所有2比较
+		{
+			if (arry1[i][0]==arry2[j][0])
+			{
+				hituser1[hitu] = i;
+				hituser2[hitu] = j;
+				hitu++;
+			}
+		}
+	}
+	for (size_t i = 0; i < hitu; i++)
+	//遍历所有命中用户，此时i代表hituser1/2中的序号，hituser1/2[i]代表user id在1，2中的序号
+	{
+		for (size_t j = 0; j < len_arry1_ev[hituser1[i]]; j++)
+		//遍历某命中用户的预测品牌
+		{
+			for (size_t k = 0; k < len_arry2_ev[hituser2[i]]; k++)
+			//比较预测品牌和所有实际品牌
+			{
+				if (arry1[hituser1[i]][j] == arry2[hituser2[i]][k])
+				{
+					hit++;
+				}
+			}
+		}
+	}
+
+	for (size_t i = 0; i < len_arry1; i++)
+	//计算命中数
+	{
+		pBrand += len_arry1_ev[i];
+	}
+
+	for (size_t i = 0; i < len_arry2; i++)
+	//计算召回数
+	{
+		bBrand += len_arry2_ev[i];
+	}
+
+	prst[0] = static_cast<double> (hit / pBrand);
+	//命中率
+	prst[1] = static_cast<double> (hit / bBrand);
+	//召回率
+	prst[2] = static_cast<double>(2 * prst[0] * prst[1] / (prst[0] + prst[1]));
+	//得分
+
+	return prst;
 }
