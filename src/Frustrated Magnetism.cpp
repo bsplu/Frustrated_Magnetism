@@ -321,18 +321,28 @@ void check_arry_re(int ** &arry_buy_list,int &len_arry_buy_list,int *&len_arry_b
 		for(;i_ev<len_arry_buy_list_ev[i];i_ev++){
 			int j_ev = 1;
 			for(;j_ev<i_ev;j_ev++){
-				if(arry_buy_list[i][i_ev] == arry_buy_list[i][j_ev])
-					break;
+				if(abs(arry_buy_list[i][i_ev]) == abs(arry_buy_list[i][j_ev])){
+					if(arry_buy_list[i][i_ev] > 0){
+						arry_buy_list[i][i_ev] = 0;
+					}else if(arry_buy_list[i][j_ev] > 0){
+						arry_buy_list[i][j_ev] = 0;
+					}else
+						arry_buy_list[i][i_ev] = 0;
+				}
+
+			}
+		}
+
+
+		for(i_ev = 0;i_ev<len_arry_buy_list_ev[i];i_ev++){
+			if(arry_buy_list[i][i_ev] == 0 || arry_buy_list[i][i_ev]<0){
+				for(int j=i_ev;j<len_arry_buy_list_ev[i]-1;j++){
+					arry_buy_list[i][j] = arry_buy_list[i][j+1];
+				}
+				i_ev--;
+				len_arry_buy_list_ev[i]--;
 			}
 
-			//有重复的，复制
-			if(j_ev<i_ev){
-				for(int j_c = i_ev;j_c<len_arry_buy_list_ev[i]-1;j_c++){
-					arry_buy_list[i][j_c] = arry_buy_list[i][j_c+1];
-				}
-				len_arry_buy_list_ev[i]--;
-				i_ev--;
-			}
 		}
 	}
 }
@@ -1559,11 +1569,19 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,int f_m_
 			//第二判断阶段，判断一个人买过的商品买第二次的可能性
 			double P_again = (buy_num_total >2)? buy_num_again/buy_num_total:0;//回头概率
 			//如果一个人回头率比较高，我们认为他买过的商品还会买
-			if(false){
+			if(P_again > 0.35){
 				for(int i=0;i<arry_person[i_a_p].leng_s_p_buyim;i++){
 					if(p.p_buyimformation[i].type == 1){
 						arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
 								p.p_buyimformation[i].brand_id;
+						leng_s_a_b_l[i_a_p]++;
+					}
+				}
+			}else if(P_again <0.2){
+				for(int i=0;i<arry_person[i_a_p].leng_s_p_buyim;i++){
+					if(p.p_buyimformation[i].type == 1){
+						arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
+								-1*p.p_buyimformation[i].brand_id;
 						leng_s_a_b_l[i_a_p]++;
 					}
 				}
