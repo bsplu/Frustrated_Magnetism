@@ -314,7 +314,28 @@ void chose_kind_from_day(int b_month, int b_day,int e_month,int e_day,person * a
 	delete [] len_a_b_l_re;
 }
 
+//检查arry中是否有重复的商品，有的话剔除
+void check_arry_re(int ** &arry_buy_list,int &len_arry_buy_list,int *&len_arry_buy_list_ev){
+	for(int i=0;i<len_arry_buy_list;i++){
+		int i_ev = 2;
+		for(;i_ev<len_arry_buy_list_ev[i];i_ev++){
+			int j_ev = 1;
+			for(;j_ev<i_ev;j_ev++){
+				if(arry_buy_list[i][i_ev] == arry_buy_list[i][j_ev])
+					break;
+			}
 
+			//有重复的，复制
+			if(j_ev<i_ev){
+				for(int j_c = i_ev;j_c<len_arry_buy_list_ev[i]-1;j_c++){
+					arry_buy_list[i][j_c] = arry_buy_list[i][j_c+1];
+				}
+				len_arry_buy_list_ev[i]--;
+				i_ev--;
+			}
+		}
+	}
+}
 
 int main() {
 	void read_txt(person* &arry_person, int & leng_s_arry_person);
@@ -1471,6 +1492,10 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,int f_m_
 			//{----------------------------------------------------------------------------------------
 			//看一个人买一个东西后又买一次的可能性
 
+
+			double buy_num_total = 0;//一共买过的次数
+			double buy_num_again = 0;//回头次数
+
 			for (int i_brand_e = 0,i_brand_b = 0; i_brand_e < arry_person[i_a_p].leng_s_p_buyim; i_brand_e++) {
 				if (p.p_buyimformation[i_brand_b].brand_id != p.p_buyimformation[i_brand_e].brand_id) {
 
@@ -1479,6 +1504,7 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,int f_m_
 					int leng_s_buy = 0;
 					for (int i = i_brand_b; i < i_brand_e; i++) {
 						if (p.p_buyimformation[i].type == 1) {
+
 							if (leng_s_buy == 0) {
 								buy[leng_s_buy] = p.p_buyimformation[i];
 								leng_s_buy++;
@@ -1505,7 +1531,10 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,int f_m_
 						}
 					}
 
+					if(leng_s_buy >= 1)
+						buy_num_total++;
 					if (leng_s_buy > 1) {
+						buy_num_again ++;
 
 							//在预测区间，添加到购买列表中
 							arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
@@ -1527,9 +1556,18 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,int f_m_
 
 			}
 
-			//第二判断阶段，如果一个人
-
-
+			//第二判断阶段，判断一个人买过的商品买第二次的可能性
+			double P_again = (buy_num_total >2)? buy_num_again/buy_num_total:0;//回头概率
+			//如果一个人回头率比较高，我们认为他买过的商品还会买
+			if(false){
+				for(int i=0;i<arry_person[i_a_p].leng_s_p_buyim;i++){
+					if(p.p_buyimformation[i].type == 1){
+						arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
+								p.p_buyimformation[i].brand_id;
+						leng_s_a_b_l[i_a_p]++;
+					}
+				}
+			}
 			//购买重复模块end}=================================================================================
 /*
 			//收藏模块{--------------------------------------------------------------------------------------
@@ -1630,21 +1668,31 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,int f_m_
 					i_b_b_l = i_b_b_l == 0 ? i_b_b + 1 : i_b_b_l + 1;
 
 					//开始记录平均值
-					int day_gap_value = day_gap(p_bimf_l.p_buyimformation[i_b].visit_datetime_month,
+					//day_gap_value1描述查看天数
+					double day_gap_value1 = day_gap(p_bimf_l.p_buyimformation[i_b].visit_datetime_month,
 							p_bimf_l.p_buyimformation[i_b].visit_datetime_day,
 							p_bimf_l.p_buyimformation[i_b_b_l].visit_datetime_month,
 							p_bimf_l.p_buyimformation[i_b_b_l].visit_datetime_day);
-					if (day_gap_value < 0)
+
+					//int day_gap_value2描述有几天查看
+					double day_gap_value2 = 0;
+					for(int i_check_d = i_b_b_l+1;i_check_d<i_b;i_check_d++){
+						if(compare(p_bimf_l.p_buyimformation[i_check_d],p_bimf_l.p_buyimformation[i_check_d-1]) != 0){
+							day_gap_value2++;
+						}
+					}
+					if (day_gap_value1 < 0)
 						exit(0);
-					if (day_gap_value == 0)
+					if (day_gap_value1 == 0)
 						continue;
 					//cout<<day_gap_value<<endl;
 
-					arry_p_b_hbt[0][i_a_p] += double(day_gap_value);
-					arry_p_b_hbt[1][i_a_p] += double(day_gap_value * day_gap_value);
+					arry_p_b_hbt[0][i_a_p] += double(day_gap_value1);
+					arry_p_b_hbt[1][i_a_p] += double(day_gap_value1 * day_gap_value1);
 					arry_p_b_hbt[2][i_a_p] += 1.0;
 
-					double num_check_rel = (double(i_b)-double(i_b_b_l))/double(day_gap_value);
+
+					double num_check_rel = day_gap_value2 >0 ?(double(i_b)-double(i_b_b_l))/double(day_gap_value2):0;
 					/*
 					double num_check_rel = 0.;
 					for(int i=i_b_b_l+1;i<i_b;i++){
@@ -1731,7 +1779,13 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,int f_m_
 						}
 						double d_g = day_gap(p.p_buyimformation[i_brand_e-1].visit_datetime_month,p.p_buyimformation[i_brand_e-1].visit_datetime_day
 								,p.p_buyimformation[i_brand_b].visit_datetime_month,p.p_buyimformation[i_brand_b].visit_datetime_day);
-						cout<<"查看天数:"<<d_g<<"\t次数:"<<double(i_brand_e-i_brand_b)<<"\t"<<double(i_brand_e-i_brand_b)/d_g<<endl;
+						double day_gap_value2 = 0;
+						for(int i_check_d = i_brand_b+1;i_check_d<i_brand_e;i_check_d++){
+							if(compare(p.p_buyimformation[i_check_d],p.p_buyimformation[i_check_d-1]) != 0){
+								day_gap_value2++;
+							}
+						}
+						cout<<"查看天数1:"<<d_g<<"\t天数2："<<day_gap_value2<<"\t次数:"<<double(i_brand_e-i_brand_b)<<"\t1:"<<double(i_brand_e-i_brand_b)/d_g<<"\t2:"<<double(i_brand_e-i_brand_b)/day_gap_value2<<endl;
 						cout<<"-------------------------------------------------"<<endl;
 
 
@@ -1790,7 +1844,7 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,int f_m_
 
 		//转化end}=========================================================================================
 
-
+		check_arry_re(arry1,len_arry1,len_arry1_ev);
 
 //f_m_b,f_d_b,f_m_e,f_d_e
 
