@@ -371,7 +371,7 @@ int main() {
 
 
 	//solution4(arry_person, leng_s_arry_person,7,16,8,15);
-	solution4(arry_person, leng_s_arry_person,7,16,8,15);
+	solution5(arry_person, leng_s_arry_person,7,16,8,15);
 
 	/*
 	for(int i=0;i<len_arry_cnnct;i++){
@@ -2346,6 +2346,7 @@ void findconnect(person * arry_person_input,int len_arry_person_input,int ** & a
 					continue;
 				for(int k=0;k<len_buycheckid;k++){
 					if(p_f[j].brand_id == buycheckid[k]){
+						cout<<buycheckid[k]<<endl;
 						ifshoudjoin =true;
 						break;
 					}
