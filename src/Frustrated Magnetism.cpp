@@ -6,16 +6,17 @@
 // Description :
 //============================================================================
 
-#include<iostream>
-#include <time.h>
-#include<fstream>
-#include<iomanip>
-#include<math.h>
-#include<stdlib.h>
-#include <sstream>
+#include <math.h>
 #include <omp.h>
-
-#include<windows.h>
+#include <stdlib.h>
+#include <time.h>
+#include <windows.h>
+#include <cstdio>
+#include <cwchar>
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
 
 using namespace std;
 
@@ -1884,41 +1885,29 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,int f_m_
 		for (int i_a_p = 0; i_a_p < leng_s_arry_person; i_a_p++) {
 			person &p = arry_person[i_a_p];
 
-
+			//存在问题！逻辑混乱，对于只有购买1次，没有查看的商品，被跳过了，没有判断
 				for (int i_brand_e = 0,i_brand_b = 0; i_brand_e < arry_person[i_a_p].leng_s_p_buyim; i_brand_e++) {
 					//从购买的下一个开始
 					if(i_brand_e != 0 && (p.p_buyimformation[i_brand_e-1].brand_id == p.p_buyimformation[i_brand_e].brand_id) && p.p_buyimformation[i_brand_e].type == 1){
+						//有查看但是以购买作为分割
+						//最后一次对商品的行为是购买
+						if(i_brand_e == arry_person[i_a_p].leng_s_p_buyim-1 || (p.p_buyimformation[i_brand_e].brand_id == p.p_buyimformation[i_brand_e+1].brand_id)){
+							if(day_gap(p.p_buyimformation[i_brand_e].visit_datetime_month,p.p_buyimformation[i_brand_e].visit_datetime_day,f_m_b,f_d_b) < 20){
+								arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] = p.p_buyimformation[i_brand_b].brand_id;
+								leng_s_a_b_l[i_a_p]++;
+							}
+						}
+
+
 						i_brand_b = i_brand_e+1;
 						continue;
 					}
 
 					if (i_brand_b >0 && p.p_buyimformation[i_brand_b-1].brand_id == p.p_buyimformation[i_brand_b].brand_id &&
 							p.p_buyimformation[i_brand_b].brand_id != p.p_buyimformation[i_brand_e].brand_id) {
-													//再次购买如果一个人在几天内查看突破天际的话就说明他要购买
-													double num_over_check_av = 0;
-													for (int i_brand_e_d = i_brand_b,i_brand_b_d = i_brand_b; i_brand_e_d < i_brand_e; i_brand_e_d++) {
 
-														double num_one_day = 0;
-																if (compare(p.p_buyimformation[i_brand_b_d], p.p_buyimformation[i_brand_e_d]) != 0
-																		) {
-																	//单天查看次数
-																	num_one_day = i_brand_e_d-i_brand_b_d;
-																	i_brand_b_d = i_brand_e_d;
-																	i_brand_e_d--;
-																}
-
-																	num_over_check_av += num_one_day/3.;
-
-
-
-													}
-													if(num_over_check_av >= 1 ){
-														arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] = p.p_buyimformation[i_brand_b].brand_id;
-														leng_s_a_b_l[i_a_p]++;
-													}
-													i_brand_b = i_brand_e;
-													i_brand_e--;
-												}
+						//判断一下前一次购买后距其最近的一次查看日期
+					}
 
 					else if (p.p_buyimformation[i_brand_b].brand_id != p.p_buyimformation[i_brand_e].brand_id) {
 								//如果一个人在几天内查看突破天际的话就说明他要购买
@@ -1975,7 +1964,7 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,int f_m_
 
 		//如果买了
 		if(i_find_u != len_arry2){
-			cout<<"周期:"<<arry_p_b_hbt[0][i_a_p]<<"\t标准差"<<arry_p_b_hbt[1][i_a_p]<<"\t平均次数:"<<arry_p_b_hbt[3][i_a_p]<<"\t标准差:"<<arry_p_b_hbt[4][i_a_p]<<endl;
+			//cout<<"周期:"<<arry_p_b_hbt[0][i_a_p]<<"\t标准差"<<arry_p_b_hbt[1][i_a_p]<<"\t平均次数:"<<arry_p_b_hbt[3][i_a_p]<<"\t标准差:"<<arry_p_b_hbt[4][i_a_p]<<endl;
 		for (int i_brand_e = 0,i_brand_b = 0; i_brand_e < arry_person[i_a_p].leng_s_p_buyim; i_brand_e++) {
 			//cout<<p.p_buyimformation[i_brand_b].brand_id<<"\t"<<p.p_buyimformation[i_brand_e].brand_id<<endl;
 					if (p.p_buyimformation[i_brand_b].brand_id != p.p_buyimformation[i_brand_e].brand_id) {
@@ -2002,7 +1991,7 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,int f_m_
 
 
 						for (int i = i_brand_b; i < i_brand_e; i++) {
-							cout<<arry_person[i_a_p].get_person_id()<<"\t"<<p.p_buyimformation[i].brand_id<<"\t"<<p.p_buyimformation[i].type<<"\t"<<p.p_buyimformation[i].visit_datetime_month<<"."<<p.p_buyimformation[i].visit_datetime_day<<endl;
+							cout<<i_a_p<<"\t"<<arry_person[i_a_p].get_person_id()<<"\t"<<p.p_buyimformation[i].brand_id<<"\t"<<p.p_buyimformation[i].type<<"\t"<<p.p_buyimformation[i].visit_datetime_month<<"."<<p.p_buyimformation[i].visit_datetime_day<<endl;
 						}
 						double d_g = day_gap(p.p_buyimformation[i_brand_e-1].visit_datetime_month,p.p_buyimformation[i_brand_e-1].visit_datetime_day
 								,p.p_buyimformation[i_brand_b].visit_datetime_month,p.p_buyimformation[i_brand_b].visit_datetime_day);
@@ -2012,9 +2001,7 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,int f_m_
 								day_gap_value2++;
 							}
 						}
-						cout<<"查看天数1:"<<d_g<<"\t天数2："<<day_gap_value2<<"\t次数:"<<double(i_brand_e-i_brand_b)<<"\t1:"<<double(i_brand_e-i_brand_b)/d_g
-								<<"\t2:"<<double(i_brand_e-i_brand_b)/day_gap_value2<<"\tP_b="<<P_buy_p[0][i_a_p]
-						<<endl;
+
 						cout<<"-------------------------------------------------"<<endl;
 
 
