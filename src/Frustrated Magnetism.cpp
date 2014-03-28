@@ -26,7 +26,7 @@ int compare(BuyImformation a, BuyImformation b);
 void BubbleSort(BuyImformation * pData, int Count);
 int compare(BuyImformation a, BuyImformation b);
 double* score(int ** arry1, int *len_arry1_ev, int len_arry1, int ** arry2, int *len_arry2_ev, int len_arry2);
-
+void findconnect(person * arry_person_input,int len_arry_person_input,int ** & arry_person_connect,int * & len_a_p_c,int *&buy_num);
 
 class BuyImformation {
 public:
@@ -155,7 +155,7 @@ public:
 		leng_p_buyim = a.leng_p_buyim;
 		leng_s_p_buyim = a.leng_s_p_buyim;
 
-		if (a.leng_p_buyim > 0) {
+		if (a.leng_p_buyim >= 0) {
 			delete[] this->p_buyimformation;
 			this->p_buyimformation = NULL;
 			this->p_buyimformation = new BuyImformation[a.leng_p_buyim];
@@ -174,16 +174,21 @@ public:
 		leng_p_buyim = a.leng_p_buyim;
 		leng_s_p_buyim = a.leng_s_p_buyim;
 
-		if (a.leng_p_buyim > 0) {
+		if (a.leng_p_buyim >= 0) {
 			this->p_buyimformation = NULL;
 			this->p_buyimformation = new BuyImformation[a.leng_p_buyim];
 			for (int i = 0; i < leng_s_p_buyim; i++) {
 				this->p_buyimformation[i] = a.p_buyimformation[i];
 			}
-		}else{
+
+		}
+
+		else{
+			cout<<a.leng_p_buyim<<endl;
 			cout<<"operat erro"<<endl;
 			exit(0);
 		}
+
 	}
 
 	~person() {
@@ -354,6 +359,8 @@ int main() {
 			int f_m_e=9,int f_d_e=15);
 	void solution4(person * arry_person_input, int leng_s_arry_person_input,int f_m_b=8,int f_d_b=16,
 			int f_m_e=9,int f_d_e=15);
+	void solution5(person * arry_person_input, int leng_s_arry_person_input,int f_m_b=8,int f_d_b=16,
+				int f_m_e=9,int f_d_e=15);
 	srand((unsigned) time(NULL));
 	person * arry_person = NULL;
 	int leng_s_arry_person = 0;
@@ -363,10 +370,17 @@ int main() {
 	read_txt(arry_person, leng_s_arry_person);
 
 
+	//solution4(arry_person, leng_s_arry_person,7,16,8,15);
 	solution4(arry_person, leng_s_arry_person,7,16,8,15);
-	//solution3(arry_person, leng_s_arry_person,7,16,8,15);
 
-
+	/*
+	for(int i=0;i<len_arry_cnnct;i++){
+		for(int j=0;j<len_arry_cnnct_ev[i];j++){
+			cout<<arry_cnnct[i][j]<<"\t";
+		}
+		cout<<endl;
+	}
+	*/
 	return 0;
 }
 
@@ -2056,6 +2070,332 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,int f_m_
 			cout<<value_score[0]*100.0<<"%\t"<<value_score[1]*100.0<<"%\t"<<value_score[2]*100.0<<"%"<<endl;
 
 }
+
+void solution5(person * arry_person_input, int leng_s_arry_person_input,int f_m_b=8,int f_d_b=16,
+			int f_m_e=9,int f_d_e=15){
+
+
+	const double C1 = 0.0;//如果两个用户间没有交集取0.5代替
+	const double C2 = 0.1;//
+
+
+
+	person * arry_person = new person[leng_s_arry_person_input];
+	int leng_s_arry_person = leng_s_arry_person_input;
+	for (int i = 0; i < leng_s_arry_person; i++) {
+		arry_person[i] = arry_person_input[i];
+		arry_person[i].delete_by_day(f_m_b, f_d_b);
+	}
+
+	int ** arry_cnnct;
+	int *len_arry_cnnct_ev;
+	int *buy_num;
+
+	findconnect(arry_person, leng_s_arry_person, arry_cnnct, len_arry_cnnct_ev,
+			buy_num);
+
+	//
+	int **arry_buy_list = new int *[leng_s_arry_person];
+	int *leng_s_a_b_l = new int[leng_s_arry_person];
+	int *leng_a_b_l = new int[leng_s_arry_person];
+
+	for(int i=0;i<leng_s_arry_person;i++){
+		leng_a_b_l[i] = 1000;
+		leng_s_a_b_l[i] = 0;
+		arry_buy_list[i] = new int [leng_a_b_l[i]];
+	}
+
+	int ** arry2;
+	int * len_arry2_ev = NULL;
+	int len_arry2 = 0;
+
+	chose_kind_from_day(f_m_b, f_d_b, f_m_e, f_d_e, arry_person_input,
+			leng_s_arry_person_input, arry2, len_arry2, len_arry2_ev, 1);
+
+	int * userid = new int [len_arry_cnnct_ev[0]+1];
+	int len_userid = len_arry_cnnct_ev[0]+1;
+	userid[0] = 0;
+	for(int i=1;i<len_arry_cnnct_ev[0]+1;i++){
+		userid[i] = arry_cnnct[0][i-1];
+	}
+	int * buyid = new int [2000];
+	int len_buyid = 0;
+
+	for(int i=0;i<leng_s_arry_person;i++){
+		delete [] arry_cnnct[i];
+	}
+	delete [] arry_cnnct;
+	delete [] len_arry_cnnct_ev;
+
+	double ** arry_buy_cnnct_m = new double *[len_userid];
+	for(int i=0;i<len_userid;i++){
+		arry_buy_cnnct_m[i] = new double [2000];
+	}
+
+	for(int i=0;i<len_userid;i++){
+		BuyImformation *p = arry_person[userid[i]].p_buyimformation;
+		for(int j=0;j<arry_person[userid[i]].leng_s_p_buyim;j++){
+			if(p[j].type == 1){
+
+
+			int k=0;
+			for(;k<len_buyid;k++){
+				if(p[j].brand_id == buyid[k]){
+					arry_buy_cnnct_m[i][k] = 1;
+					break;
+				}
+			}
+			if(k == len_buyid){
+				buyid[len_buyid] = p[j].brand_id;
+				arry_buy_cnnct_m[i][len_buyid] = 1;
+				len_buyid++;
+			}
+			}
+		}
+	}
+	int **num_cover = new int *[len_userid];
+	for(int i=0;i<len_userid;i++){
+		num_cover[i] = new int [len_userid];
+	}
+
+	for(int i=0;i<len_userid;i++){
+		for(int j=i+1;j<len_userid;j++){
+			int num_cover_l = 0;
+			for(int k=0;k<len_buyid;k++){
+				if(arry_buy_cnnct_m[i][k] + arry_buy_cnnct_m[j][k] == 2)
+					num_cover_l ++;
+			}
+			num_cover[i][j] = num_cover_l;
+			num_cover[j][i] = num_cover_l;
+		}
+	}
+	//对于每一个人筛选
+#pragma omp parallel for
+	for(int i_a=0;i_a<len_userid;i_a++){
+
+		//对于每一件商品
+		for(int i_br = 0;i_br <len_buyid;i_br++){
+
+			if(arry_buy_cnnct_m[i_a][i_br] == 1)
+				continue;
+			double rio = 0 ;
+			for(int i_b=0;i_b<len_userid;i_b++){
+				if(i_a == i_b)
+					continue;
+				//cout<<num_cover[i_a][i_b]<<endl;
+				if(arry_buy_cnnct_m[i_b][i_br] == 1)
+					rio+= pow(double(num_cover[i_a][i_b]),2)/double(buy_num[i_b]);
+
+			}
+			rio *= 0.1*double(buy_num[i_a]);
+			if(rio >= 0.5){
+				int i_a_p = userid[i_a];
+
+				arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] = buyid[i_br];
+				leng_s_a_b_l[i_a_p]++;
+			}
+		}
+
+	}
+
+	for(int i=0;i<len_userid;i++){
+		delete [] num_cover[i];
+
+	}
+	delete [] num_cover;
+
+	for(int i=0;i<len_userid;i++){
+		delete [] arry_buy_cnnct_m[i];
+	}
+	delete [] arry_buy_cnnct_m;
+	delete []userid;
+	delete [] buyid;
+
+
+
+
+	int ** arry1;
+	int * len_arry1_ev = NULL;
+	int len_arry1 =0;
+
+
+	//将buy_list转换为arry1形式储存{-----------------------------------------------------------------------
+	//现判断一下len_arry1的大小
+	for(int i=0;i<leng_s_arry_person;i++){
+		if(leng_s_a_b_l[i]>0){
+			len_arry1++;
+		}
+	}
+	arry1 = new int *[len_arry1];
+	len_arry1_ev = new int [len_arry1];
+	int i_arry_buy_list = 0;
+	for(int i=0;i<len_arry1;i++){
+		len_arry1_ev[i] = 0;
+		for(;i_arry_buy_list<leng_s_arry_person;i_arry_buy_list++){
+			if(leng_s_a_b_l[i_arry_buy_list] > 0){
+				int len_local = leng_s_a_b_l[i_arry_buy_list];
+				len_arry1_ev[i] = len_local+1;
+				arry1[i] = new int [len_local+1];
+				arry1[i][0] = arry_person[i_arry_buy_list].get_person_id();
+
+				for(int j=0;j<leng_s_a_b_l[i_arry_buy_list];j++){
+					arry1[i][j+1] = arry_buy_list[i_arry_buy_list][j];
+				}
+				i_arry_buy_list++;
+				break;
+			}
+		}
+	}
+
+	//转化end}=========================================================================================
+
+	check_arry_re(arry1,len_arry1,len_arry1_ev);
+
+
+	double * value_score = NULL;
+				value_score = score(arry1,len_arry1_ev,len_arry1,arry2,len_arry2_ev,len_arry2);
+				cout<<value_score[0]*100.0<<"%\t"<<value_score[1]*100.0<<"%\t"<<value_score[2]*100.0<<"%"<<endl;
+
+
+}
+
+void findconnect(person * arry_person_input,int len_arry_person_input,int ** & arry_person_connect,int * & len_a_p_c,int *&buy_num){
+
+	person * arry_person = new person[len_arry_person_input];
+	int len_arry_person = len_arry_person_input;
+	for (int i = 0; i < len_arry_person; i++) {
+		arry_person[i] = arry_person_input[i];
+	}
+
+
+
+	arry_person_connect = new int *[len_arry_person];
+	buy_num = new int [len_arry_person];
+	int **arry_connect_local = new int *[len_arry_person];
+	len_a_p_c = new int [len_arry_person];
+	int * len_a_p_c_l = new int [len_arry_person];
+	int * len_a_p_c_ln = new int [len_arry_person];
+	for(int i=0;i<len_arry_person;i++){
+		arry_person_connect[i] = new int [len_arry_person];
+		arry_connect_local[i] = new int [len_arry_person];
+		len_a_p_c[i] = 0;
+		len_a_p_c_l[i] = 0;
+		len_a_p_c_ln[i] = 0;
+	}
+
+	int num_save_s = 0;
+	int num_find_total = 0;//已经找到的
+
+	//先找到第一个人作为开始
+
+				arry_connect_local[0][0] = 0;
+				len_a_p_c_l[0] = 1;
+				num_save_s = 1;
+				num_find_total++;
+				if(arry_person[0].leng_s_p_buyim != 0)
+					arry_person[0].leng_s_p_buyim *= -1;
+				else
+					arry_person[0].leng_s_p_buyim = -1;
+
+
+	//开始查找
+	do{
+		if(num_find_total == len_arry_person)
+			break;
+
+		if(len_a_p_c_l[num_save_s-1] == len_a_p_c_ln[num_save_s-1]){
+			//说明一个组的已经找完，开始下一个组
+			for(int i=0;i<len_arry_person;i++){
+				if(arry_person[i].leng_s_p_buyim>=0){
+					arry_connect_local[num_save_s][0] = i;
+					len_a_p_c_l[num_save_s] = 1;
+					num_save_s++;
+					num_find_total++;
+					if(arry_person[i].leng_s_p_buyim != 0)
+						arry_person[i].leng_s_p_buyim *= -1;
+					else
+						arry_person[i].leng_s_p_buyim = -1;
+					break;
+				}
+			}
+		}
+
+		//查找与checkid对应的人有联系的人
+					int checkid = arry_connect_local[num_save_s-1][len_a_p_c_ln[num_save_s-1]];
+					BuyImformation * p_r = arry_person[checkid].p_buyimformation;
+					int buycheckid[500];
+					int len_buycheckid = 0;
+								for(int j=0;j<abs(arry_person[checkid].leng_s_p_buyim);j++){
+									if(p_r[j].type != 1)
+										continue;
+									buycheckid[len_buycheckid] = p_r[j].brand_id;
+									len_buycheckid++;
+								}
+					buy_num[checkid] = len_buycheckid;
+		for(int i=0;i<abs(len_arry_person);i++){
+
+			//首先判断一下该user是否已加入小组
+			if(arry_person[i].leng_s_p_buyim < 0 )
+				continue;
+
+			//该用户没有加入，判断一下是否需要加入
+			bool ifshoudjoin = false;
+			BuyImformation * p_f = arry_person[i].p_buyimformation;
+			for(int j=0;j<abs(arry_person[i].leng_s_p_buyim);j++){
+				if(p_f[j].type != 1)
+					continue;
+				for(int k=0;k<len_buycheckid;k++){
+					if(p_f[j].brand_id == buycheckid[k]){
+						ifshoudjoin =true;
+						break;
+					}
+
+				}
+				if(ifshoudjoin)
+					break;
+			}
+			if(ifshoudjoin){
+				arry_connect_local[num_save_s-1][len_a_p_c_l[num_save_s-1]] = i;
+				len_a_p_c_l[num_save_s-1]++;
+				if(arry_person[i].leng_s_p_buyim != 0)
+				arry_person[i].leng_s_p_buyim *=-1;
+				else
+					arry_person[i].leng_s_p_buyim = -1;
+				num_find_total++;
+			}
+		}
+		len_a_p_c_ln[num_save_s-1]++;
+	}while(1);
+
+
+	//将arry_connect_local转化为分用户储存方便查看
+	for(int i=0;i<num_save_s;i++){
+		for(int j=0;j<len_a_p_c_l[i];j++){
+			for(int k=0;k<len_a_p_c_l[i];k++){
+				int ci = arry_connect_local[i][j];
+				if(ci == arry_connect_local[i][k])
+					continue;
+
+				arry_person_connect[ci][len_a_p_c[ci]] = arry_connect_local[i][k];
+				len_a_p_c[ci]++;
+			}
+		}
+	}
+
+
+	delete [] arry_person;
+	delete [] len_a_p_c_l;
+	delete [] len_a_p_c_ln;
+	for(int i=0;i<len_arry_person;i++){
+
+		delete [] arry_connect_local[i];
+
+	}
+	delete [] arry_connect_local;
+
+}
+
+
 
 //对BuyImformation进行排序，以brand_id递增的方式排序，相同id内以日期递增的方式排序
 void BubbleSort(BuyImformation * pData, int Count) {
