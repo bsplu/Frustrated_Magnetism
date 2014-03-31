@@ -398,7 +398,7 @@ int main() {
 	read_txt(arry_person, leng_s_arry_person);
 
 	//solution4(arry_person, leng_s_arry_person,7,16,8,15);
-	solution_test2(arry_person, leng_s_arry_person, 7, 16, 8, 15);
+	solution4(arry_person, leng_s_arry_person, 6, 16, 7, 15);
 
 	return 0;
 }
@@ -1602,7 +1602,7 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 
 	 double **Pbuy_again;
 	 int len_Pbuy_again = 0;
-	 findPbuyagain(arry_person,leng_s_arry_person,Pbuy,len_Pbuy);
+	 findPbuyagain(arry_person,leng_s_arry_person,Pbuy_again,len_Pbuy_again);
 
 
 	int **arry_buy_list = new int *[leng_s_arry_person];
@@ -1981,12 +1981,14 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 	for (int i_a_p = 0; i_a_p < leng_s_arry_person; i_a_p++) {
 
 		person &p = arry_person[i_a_p];
+		/*
 		if (arry_person[i_a_p].get_person_id() == 4475750) {
 			for (int i = 0; i < arry_person[i_a_p].leng_s_p_buyim; i++) {
 				cout << i << "\t" << p.p_buyimformation[i].brand_id << "\t"
 						<< p.p_buyimformation[i].type << endl;
 			}
 		}
+		*/
 		for (int i_brand_e = 0, i_brand_b = 0;
 				i_brand_e < arry_person[i_a_p].leng_s_p_buyim; i_brand_e++) {
 
@@ -2156,38 +2158,87 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 						}
 					}
 
+
+					//branch{---------------------------------------------------------------------
+					int i_Pbuy_ag = 0;
+					for (; i_Pbuy_ag < len_Pbuy_again; i_Pbuy_ag++) {
+						if (p.p_buyimformation[i_brand_e].brand_id
+								== Pbuy_again[0][i_Pbuy_ag]) {
+							break;
+						}
+					}
+
+					//branch}=====================================================================
+
 					bool ifjoinbuylist = false;
-					if (Pbuy[2][i_Pbuy] >= 50 && Pbuy[1][i_Pbuy] > 0.09) {
-						ifjoinbuylist = true;
-					} else if (Pbuy[2][i_Pbuy] >= 20 && Pbuy[2][i_Pbuy] < 30
-							&& Pbuy[1][i_Pbuy] > 0.1) {
-						ifjoinbuylist = true;
-					} else if (Pbuy[2][i_Pbuy] >= 10 && Pbuy[2][i_Pbuy] < 20
-							&& Pbuy[1][i_Pbuy] > 0.3) {
-						ifjoinbuylist = true;
-					} else if (Pbuy[2][i_Pbuy] >= 0 && Pbuy[2][i_Pbuy] < 10) {
+					if (Pbuy[2][i_Pbuy] >= 0 && Pbuy[2][i_Pbuy] < 10) {
 						ifjoinbuylist = true;
 					}
-					if (ifjoinbuylist) {
+
+					if (Pbuy_again[1][i_Pbuy_ag] > 0 ) {
 						//最后一次的行为是购买{----------------------------------------------------------
 
 						try {
 							if (p.p_buyimformation[i_brand_e - 1].brand_id
 									!= p.p_buyimformation[i_brand_e].brand_id) {
 
-								if (!(Pbuy[2][i_Pbuy] >= 0
-										&& Pbuy[2][i_Pbuy] < 10)) {
+								//branch buyagain{---------------------------------------
+								arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
+										p.p_buyimformation[i_brand_e].brand_id;
+								leng_s_a_b_l[i_a_p]++;
+								//}====================================================
+								/*master
+								 if (!(Pbuy[2][i_Pbuy] >= 0
+								 && Pbuy[2][i_Pbuy] < 10)) {
 
-									arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
-											p.p_buyimformation[i_brand_e].brand_id;
-									leng_s_a_b_l[i_a_p]++;
-								} else if (Pbuy[2][i_Pbuy] >= 0
-										&& Pbuy[2][i_Pbuy] < 10
-										&& Pbuy[1][i_Pbuy] > 0.4) {
-									arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
-											p.p_buyimformation[i_brand_e].brand_id;
-									leng_s_a_b_l[i_a_p]++;
-								}
+								 arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
+								 p.p_buyimformation[i_brand_e].brand_id;
+								 leng_s_a_b_l[i_a_p]++;
+								 } else if (Pbuy[2][i_Pbuy] >= 0
+								 && Pbuy[2][i_Pbuy] < 10
+								 && Pbuy[1][i_Pbuy] > 0.4) {
+								 arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
+								 p.p_buyimformation[i_brand_e].brand_id;
+								 leng_s_a_b_l[i_a_p]++;
+								 }
+								 */
+							}
+						} catch (...) {
+
+						}
+
+						//最后一次的行为是购买}==========================================================
+
+						//只有一次行为是购买{--------------------------------------------------------------
+
+						try {
+							if (p.p_buyimformation[i_brand_e - 1].brand_id
+									== p.p_buyimformation[i_brand_e].brand_id) {
+
+								arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
+										p.p_buyimformation[i_brand_e].brand_id;
+								leng_s_a_b_l[i_a_p]++;
+
+							}
+						} catch (...) {
+
+							arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
+									p.p_buyimformation[i_brand_e].brand_id;
+							leng_s_a_b_l[i_a_p]++;
+
+						}
+					}else if(false){
+
+						//最后一次的行为是购买{----------------------------------------------------------
+
+						try {
+							if (p.p_buyimformation[i_brand_e - 1].brand_id
+									!= p.p_buyimformation[i_brand_e].brand_id) {
+
+								 arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
+								 p.p_buyimformation[i_brand_e].brand_id;
+								 leng_s_a_b_l[i_a_p]++;
+
 
 							}
 						} catch (...) {
@@ -2214,6 +2265,7 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 							leng_s_a_b_l[i_a_p]++;
 
 						}
+
 					}
 					//只有最后一次行为是购买}===============================================================
 
