@@ -663,6 +663,9 @@ int day_gap(int month1, int day1, int month2, int day2) {
 
 }
 
+int day_gap(BuyImformation a1,BuyImformation a2){
+	return day_gap(a1.visit_datetime_month,a1.visit_datetime_day,a2.visit_datetime_month,a2.visit_datetime_day);
+}
 //Ëã·¨1
 /*
  * by YHH
