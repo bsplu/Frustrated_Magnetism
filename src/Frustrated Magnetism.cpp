@@ -1653,7 +1653,7 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 
 						if (leng_s_buy == 0) {
 							buy[leng_s_buy] = p.p_buyimformation[i];
-							leng_s_buy++;
+							leng_s_buy+=2+p.p_buyimformation[i].num_buys;
 						} else {
 							/*
 							 if (abs(
@@ -1666,7 +1666,7 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 							 else {
 							 */
 							buy[leng_s_buy] = p.p_buyimformation[i];
-							leng_s_buy++;
+							leng_s_buy+=2+p.p_buyimformation[i].num_buys;
 							T += day_gap(
 									buy[leng_s_buy - 1].visit_datetime_month,
 									buy[leng_s_buy - 1].visit_datetime_day,
@@ -1984,14 +1984,14 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 	for (int i_a_p = 0; i_a_p < leng_s_arry_person; i_a_p++) {
 
 		person &p = arry_person[i_a_p];
-		/*
-		if (arry_person[i_a_p].get_person_id() == 4475750) {
+
+		if (arry_person[i_a_p].get_person_id() == 282500) {
 			for (int i = 0; i < arry_person[i_a_p].leng_s_p_buyim; i++) {
 				cout << i << "\t" << p.p_buyimformation[i].brand_id << "\t"
 						<< p.p_buyimformation[i].type << endl;
 			}
 		}
-		*/
+
 		for (int i_brand_e = 0, i_brand_b = 0;
 				i_brand_e < arry_person[i_a_p].leng_s_p_buyim; i_brand_e++) {
 
@@ -2055,13 +2055,10 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 					}
 				}
 
-				if ((daygap < 48 && daygap2 > 4
-						&& ((Pbuy[2][i_Pbuy] > 20 && Pbuy[1][i_Pbuy] > 0.05)
-								|| (Pbuy[2][i_Pbuy] < 20 && Pbuy[2][i_Pbuy] > 3
-										&& Pbuy[1][i_Pbuy] > 0.1)))
-						|| ((i_brand_e - i_brand_b) > 20
-								&& p.p_buyimformation[i_brand_b - 1].num_check_buy
-										> 8)) {
+				if ((daygap < 48 && daygap2 >= 4)
+						||
+						 (i_brand_e - i_brand_b) > 9
+								) {
 					//cout<<Pbuy[2][i_Pbuy]<<"\t"<<Pbuy[1][i_Pbuy]<<endl;
 					arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
 							p.p_buyimformation[i_brand_b].brand_id;
@@ -2097,14 +2094,15 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 							q = 2.5;
 						} else if (daygapvalue < 15) {
 							q = 1.5;
-						} else if (daygapvalue < 30) {
-							q = 1.1;
+						} else if (daygapvalue < 40) {
+							q = 1.2;
 						} else if (daygapvalue < 50)
 							q = 0.9;
 						else
 							q = 0.8;
 						//单天查看次数
 						num_one_day = (i_brand_e_d - i_brand_b_d) * q;
+						/*
 						if (arry_p_b_hbt[4][i_a_p] != 0
 								&& arry_p_b_hbt[4][i_a_p]
 										/ arry_p_b_hbt[3][i_a_p] < 12
@@ -2113,10 +2111,16 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 						else if ((arry_p_b_hbt[4][i_a_p] == 0)
 								&& num_one_day >= 3)
 							num_over_check_av++;
+						*/
 
+						if(num_one_day >= 2)
+							num_over_check_av++;
 						i_brand_b_d = i_brand_e_d;
 						i_brand_e_d--;
 					}
+
+
+
 
 				}
 
@@ -2135,8 +2139,23 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 					arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
 							p.p_buyimformation[i_brand_b].brand_id;
 					leng_s_a_b_l[i_a_p]++;
+				} else if (num_over_check_av >= 1
+						&& (i_brand_e - i_brand_b) >= 15 && daygap < 75) {
+					arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
+							p.p_buyimformation[i_brand_b].brand_id;
+					leng_s_a_b_l[i_a_p]++;
+				} else if (num_over_check_av >= 1
+						&& (i_brand_e - i_brand_b) >= 25 && daygap < 90) {
+					arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
+							p.p_buyimformation[i_brand_b].brand_id;
+					leng_s_a_b_l[i_a_p]++;
 				}
 
+
+				//一个人查看一直很平均，可能也会购买{--------------------------------------------------
+
+
+				//}========================================================================
 				i_brand_b = i_brand_e;
 				i_brand_e--;
 			}
@@ -2162,7 +2181,7 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 					}
 
 
-					//branch{---------------------------------------------------------------------
+
 					int i_Pbuy_ag = 0;
 					for (; i_Pbuy_ag < len_Pbuy_again; i_Pbuy_ag++) {
 						if (p.p_buyimformation[i_brand_e].brand_id
@@ -2171,14 +2190,14 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 						}
 					}
 
-					//branch}=====================================================================
+
 
 					bool ifjoinbuylist = false;
 					if (Pbuy[2][i_Pbuy] >= 0 && Pbuy[2][i_Pbuy] < 10) {
 						ifjoinbuylist = true;
 					}
 
-					if (Pbuy_again[2][i_Pbuy_ag] >= 6) {
+					if (Pbuy_again[2][i_Pbuy_ag] >= 6 ) {
 						//最后一次的行为是购买{----------------------------------------------------------
 
 						try {
