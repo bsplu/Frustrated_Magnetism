@@ -398,7 +398,7 @@ int main() {
 	read_txt(arry_person, leng_s_arry_person);
 
 	//solution4(arry_person, leng_s_arry_person,7,16,8,15);
-	solution4(arry_person, leng_s_arry_person, 6, 16, 7, 15);
+	solution4(arry_person, leng_s_arry_person, 8, 16, 9, 15);
 
 	return 0;
 }
