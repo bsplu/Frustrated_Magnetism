@@ -659,7 +659,7 @@ int day_gap(int month1, int day1, int month2, int day2) {
 		return (day1 - day2);
 	}
 
-	return sign * ((m_b - m_s) * 30 - d_b + d_s);
+	return sign * ((m_b - m_s) * 30 - d_s + d_b);
 
 }
 
