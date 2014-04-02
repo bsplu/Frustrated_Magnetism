@@ -2178,7 +2178,7 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 						ifjoinbuylist = true;
 					}
 
-					if (Pbuy_again[1][i_Pbuy_ag] > 0 ) {
+					if (Pbuy_again[2][i_Pbuy_ag] >= 6) {
 						//最后一次的行为是购买{----------------------------------------------------------
 
 						try {
@@ -2230,45 +2230,6 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 							leng_s_a_b_l[i_a_p]++;
 
 						}
-					}else if(false){
-
-						//最后一次的行为是购买{----------------------------------------------------------
-
-						try {
-							if (p.p_buyimformation[i_brand_e - 1].brand_id
-									!= p.p_buyimformation[i_brand_e].brand_id) {
-
-								 arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
-								 p.p_buyimformation[i_brand_e].brand_id;
-								 leng_s_a_b_l[i_a_p]++;
-
-
-							}
-						} catch (...) {
-
-						}
-
-						//最后一次的行为是购买}==========================================================
-
-						//只有一次行为是购买{--------------------------------------------------------------
-
-						try {
-							if (p.p_buyimformation[i_brand_e - 1].brand_id
-									== p.p_buyimformation[i_brand_e].brand_id) {
-
-								arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
-										p.p_buyimformation[i_brand_e].brand_id;
-								leng_s_a_b_l[i_a_p]++;
-
-							}
-						} catch (...) {
-
-							arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
-									p.p_buyimformation[i_brand_e].brand_id;
-							leng_s_a_b_l[i_a_p]++;
-
-						}
-
 					}
 					//只有最后一次行为是购买}===============================================================
 
