@@ -398,7 +398,7 @@ int main() {
 	read_txt(arry_person, leng_s_arry_person);
 
 	//solution4(arry_person, leng_s_arry_person,7,16,8,15);
-	solution4(arry_person, leng_s_arry_person, 7, 16, 8, 15);
+	solution4(arry_person, leng_s_arry_person, 8, 16, 9, 15);
 
 	return 0;
 }
@@ -1985,7 +1985,7 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 
 		person &p = arry_person[i_a_p];
 
-		if (arry_person[i_a_p].get_person_id() == 791500) {
+		if (arry_person[i_a_p].get_person_id() == 10212500) {
 			for (int i = 0; i < arry_person[i_a_p].leng_s_p_buyim; i++) {
 				cout << i << "\t" << p.p_buyimformation[i].brand_id << "\t"
 						<< p.p_buyimformation[i].type<<"\t"<< p.p_buyimformation[i].visit_datetime_month
@@ -2084,7 +2084,7 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 						i_brand_e_d < i_brand_e; i_brand_e_d++) {
 					double num_one_day = 0;
 					if (compare(p.p_buyimformation[i_brand_b_d],
-							p.p_buyimformation[i_brand_e_d]) != 0) {
+							p.p_buyimformation[i_brand_e_d]) != 0 || (i_brand_e_d == i_brand_e-1 && i_brand_e_d != i_brand_b)) {
 
 						double daygapvalue =
 								day_gap(f_m_b, f_d_b,
@@ -2092,17 +2092,18 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 										p.p_buyimformation[i_brand_b_d].visit_datetime_day);
 						double q = 1;
 						if (daygapvalue < 5) {
-							q = 2.5;
+							q = 1.7;
 						} else if (daygapvalue < 15) {
-							q = 1.5;
+							q = 1.4;
 						} else if (daygapvalue < 40) {
-							q = 1.2;
+							q = 1.1;
 						} else if (daygapvalue < 50)
-							q = 0.9;
+							q = 0.7;
 						else
-							q = 0.8;
+							q = 0.6;
 						//单天查看次数
-						num_one_day = (i_brand_e_d - i_brand_b_d) * q;
+
+							num_one_day = (i_brand_e_d - i_brand_b_d) * q;
 						/*
 						if (arry_p_b_hbt[4][i_a_p] != 0
 								&& arry_p_b_hbt[4][i_a_p]
@@ -2114,12 +2115,40 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 							num_over_check_av++;
 						*/
 
-						if(num_one_day >= 2)
-							num_over_check_av++;
+						//if(num_one_day >= 2)
+							num_over_check_av+=num_one_day/2.;
+
+
 						i_brand_b_d = i_brand_e_d;
+						if(i_brand_e_d != i_brand_e-1)
 						i_brand_e_d--;
 					}
 
+//					如果i_brand_e_d == i_brand_e-1说明查看该商品只用了一天
+					if (i_brand_e_d == i_brand_e - 1 && i_brand_b_d == i_brand_b) {
+						double daygapvalue =
+								day_gap(f_m_b, f_d_b,
+										p.p_buyimformation[i_brand_b_d].visit_datetime_month,
+										p.p_buyimformation[i_brand_b_d].visit_datetime_day);
+						double q =0;
+						if (daygapvalue < 5) {
+							q = 1./5.;
+						}
+
+						else if (daygapvalue < 40 && daygapvalue > 15) {
+							q = 1./15.;
+						}
+
+						else if (daygapvalue < 50)
+							q = 1./20;
+						else
+							q = 1./.30;
+
+						num_one_day = (i_brand_e_d - i_brand_b_d) * q;
+
+						num_over_check_av = num_one_day ;
+						i_brand_b_d = i_brand_e_d;
+					}
 
 
 
