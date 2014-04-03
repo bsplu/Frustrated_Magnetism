@@ -398,7 +398,7 @@ int main() {
 	read_txt(arry_person, leng_s_arry_person);
 
 	//solution4(arry_person, leng_s_arry_person,7,16,8,15);
-	solution4(arry_person, leng_s_arry_person, 8, 16, 9, 15);
+	solution4(arry_person, leng_s_arry_person, 7, 16, 8, 15);
 
 	return 0;
 }
@@ -1985,10 +1985,11 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 
 		person &p = arry_person[i_a_p];
 
-		if (arry_person[i_a_p].get_person_id() == 282500) {
+		if (arry_person[i_a_p].get_person_id() == 791500) {
 			for (int i = 0; i < arry_person[i_a_p].leng_s_p_buyim; i++) {
 				cout << i << "\t" << p.p_buyimformation[i].brand_id << "\t"
-						<< p.p_buyimformation[i].type << endl;
+						<< p.p_buyimformation[i].type<<"\t"<< p.p_buyimformation[i].visit_datetime_month
+						<<"."<<p.p_buyimformation[i].visit_datetime_day<< endl;
 			}
 		}
 
@@ -2262,6 +2263,11 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 	}
 
 	//查看次数}=====================================================================================
+
+
+
+
+
 
 	for (int i_a_p = 0; i_a_p < leng_s_arry_person; i_a_p++) {
 
