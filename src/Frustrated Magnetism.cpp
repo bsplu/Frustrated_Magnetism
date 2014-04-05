@@ -2106,10 +2106,36 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 
 						//单天查看次数
 
+
 							num_one_day = (i_brand_e_d - i_brand_b_d) * q;
+						if (compare(p.p_buyimformation[i_brand_b_d],
+								p.p_buyimformation[i_brand_e_d]) == 0) {
+							num_one_day+= q;
+						}else{
+							daygapvalue =
+									day_gap(f_m_b, f_d_b,
+											p.p_buyimformation[i_brand_e_d].visit_datetime_month,
+											p.p_buyimformation[i_brand_e_d].visit_datetime_day);
+
+							if (daygapvalue < 5) {
+								q = 1.7;
+							} else if (daygapvalue < 15) {
+								q = 1.4;
+							} else if (daygapvalue < 40) {
+								q = 1.1;
+							} else if (daygapvalue < 50)
+								q = 0.7;
+							else
+								q = 0.6;
+
+							num_one_day += q;
+						}
 
 						//if(num_one_day >= 2)
 							num_over_check_av+=num_one_day/2.;
+
+
+
 
 
 
