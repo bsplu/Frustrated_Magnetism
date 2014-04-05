@@ -2089,7 +2089,7 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 						i_brand_e_d < i_brand_e; i_brand_e_d++) {
 					double num_one_day = 0;
 					if (compare(p.p_buyimformation[i_brand_b_d],
-							p.p_buyimformation[i_brand_e_d]) != 0 || (i_brand_e_d == i_brand_e-1 && i_brand_e_d != i_brand_b)) {
+							p.p_buyimformation[i_brand_e_d]) != 0 ) {
 						//意味着有多天查看一件商品
 						double daygapvalue =
 								day_gap(f_m_b, f_d_b,
@@ -2112,24 +2112,10 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 								day_gap(f_m_b, f_d_b,
 										p.p_buyimformation[i_brand_b_d].visit_datetime_month,
 										p.p_buyimformation[i_brand_b_d].visit_datetime_day);
-						double q =0;
-						if (daygapvalue < 5) {
-							q = 1./5.;
-						}
-
-						else if (daygapvalue < 40 && daygapvalue > 15) {
-							q = 1./15.;
-						}
-
-						else if (daygapvalue < 50)
-							q = 1./20;
-						else
-							q = 1./.30;
-
-						num_one_day = (i_brand_e_d - i_brand_b_d) * q;
 
 
-						num_over_check_av = num_one_day ;
+
+
 						num_check_day = 1;
 
 						i_brand_b_d = i_brand_e_d;
