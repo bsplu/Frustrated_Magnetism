@@ -2079,8 +2079,12 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 						p.p_buyimformation[i_brand_e - 1].visit_datetime_day);
 
 				double num_over_check_av = 0;
-				double num_check_day = 0;
 
+
+				double **arry_check = new double *[2];//第一位存储距fday的距离，第二位储存当天的查看次数,
+				int  num_check_day = 0;//为储存位数，同时代表了一个人一共查看了多少天
+				arry_check[0] = new double [i_brand_e-i_brand_b];
+				arry_check[1] = new double [i_brand_e-i_brand_b];
 				for (int i_brand_e_d = i_brand_b, i_brand_b_d = i_brand_b;
 						i_brand_e_d < i_brand_e; i_brand_e_d++) {
 					double num_one_day = 0;
@@ -2091,25 +2095,9 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 								day_gap(f_m_b, f_d_b,
 										p.p_buyimformation[i_brand_b_d].visit_datetime_month,
 										p.p_buyimformation[i_brand_b_d].visit_datetime_day);
-						double q = 0;
 
-						if (daygapvalue < 5) {
-							q = 1.7;
-						} else if (daygapvalue < 15) {
-							q = 1.4;
-						} else if (daygapvalue < 40) {
-							q = 1.1;
-						} else if (daygapvalue < 50)
-							q = 0.7;
-						else
-							q = 0.6;
 
-						//单天查看次数
 
-							num_one_day = (i_brand_e_d - i_brand_b_d) * q;
-
-						//if(num_one_day >= 2)
-							num_over_check_av+=num_one_day/2.;
 
 
 
