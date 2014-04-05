@@ -398,7 +398,7 @@ int main() {
 	read_txt(arry_person, leng_s_arry_person);
 
 	//solution4(arry_person, leng_s_arry_person,7,16,8,15);
-	solution4(arry_person, leng_s_arry_person, 8, 16, 9, 15);
+	solution4(arry_person, leng_s_arry_person, 7, 16, 8, 15);
 
 	return 0;
 }
@@ -2001,7 +2001,7 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 							== p.p_buyimformation[i_brand_b].brand_id
 					&& p.p_buyimformation[i_brand_b].brand_id
 							!= p.p_buyimformation[i_brand_e].brand_id) {
-
+//对应之前有购买
 				double daygap = day_gap(f_m_b, f_d_b,
 						p.p_buyimformation[i_brand_e - 1].visit_datetime_month,
 						p.p_buyimformation[i_brand_e - 1].visit_datetime_day);
@@ -2069,7 +2069,7 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 				i_brand_b = i_brand_e;
 				i_brand_e--;
 			}
-
+//对应商品只有查看
 			else if (p.p_buyimformation[i_brand_b].brand_id
 					!= p.p_buyimformation[i_brand_e].brand_id) {
 				//如果一个人在几天内查看突破天际的话就说明他要购买
@@ -2079,18 +2079,20 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 						p.p_buyimformation[i_brand_e - 1].visit_datetime_day);
 
 				double num_over_check_av = 0;
+				double num_check_day = 0;
 
 				for (int i_brand_e_d = i_brand_b, i_brand_b_d = i_brand_b;
 						i_brand_e_d < i_brand_e; i_brand_e_d++) {
 					double num_one_day = 0;
 					if (compare(p.p_buyimformation[i_brand_b_d],
 							p.p_buyimformation[i_brand_e_d]) != 0 || (i_brand_e_d == i_brand_e-1 && i_brand_e_d != i_brand_b)) {
-
+						//意味着有多天查看一件商品
 						double daygapvalue =
 								day_gap(f_m_b, f_d_b,
 										p.p_buyimformation[i_brand_b_d].visit_datetime_month,
 										p.p_buyimformation[i_brand_b_d].visit_datetime_day);
-						double q = 1;
+						double q = 0;
+
 						if (daygapvalue < 5) {
 							q = 1.7;
 						} else if (daygapvalue < 15) {
@@ -2101,22 +2103,14 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 							q = 0.7;
 						else
 							q = 0.6;
+
 						//单天查看次数
 
 							num_one_day = (i_brand_e_d - i_brand_b_d) * q;
-						/*
-						if (arry_p_b_hbt[4][i_a_p] != 0
-								&& arry_p_b_hbt[4][i_a_p]
-										/ arry_p_b_hbt[3][i_a_p] < 12
-								&& num_one_day / arry_p_b_hbt[3][i_a_p] > 0.15)
-							num_over_check_av++;
-						else if ((arry_p_b_hbt[4][i_a_p] == 0)
-								&& num_one_day >= 3)
-							num_over_check_av++;
-						*/
 
 						//if(num_one_day >= 2)
 							num_over_check_av+=num_one_day/2.;
+
 
 
 						i_brand_b_d = i_brand_e_d;
@@ -2146,13 +2140,18 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 
 						num_one_day = (i_brand_e_d - i_brand_b_d) * q;
 
+
 						num_over_check_av = num_one_day ;
+						num_check_day = 1;
+
 						i_brand_b_d = i_brand_e_d;
 					}
 
 
 
 				}
+
+				num_over_check_av /= num_check_day;
 
 				if (num_over_check_av >= 1 && (i_brand_e - i_brand_b) >= 2
 						&& daygap < 6) {
@@ -3403,7 +3402,7 @@ double* score(int ** arry1, int *len_arry1_ev, int len_arry1, int ** arry2,
 	prst[1] = (double(hit) / double(bBrand));
 	//召回率
 
-	cout << "hit=" << hit << "\tpBrand=" << pBrand << "\tbBrand=" << bBrand
+	cout << "" << hit << "\t" << pBrand << "\tbBrand=" << bBrand
 			<< endl;
 	prst[2] = (2.0 * prst[0] * prst[1] / (prst[0] + prst[1]));
 	//得分
