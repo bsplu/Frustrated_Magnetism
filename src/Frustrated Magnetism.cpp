@@ -1985,7 +1985,7 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 
 		person &p = arry_person[i_a_p];
 
-		if (arry_person[i_a_p].get_person_id() == 10212500) {
+		if (arry_person[i_a_p].get_person_id() == 8845250 || i_a_p == 0) {
 			for (int i = 0; i < arry_person[i_a_p].leng_s_p_buyim; i++) {
 				cout << i << "\t" << p.p_buyimformation[i].brand_id << "\t"
 						<< p.p_buyimformation[i].type<<"\t"<< p.p_buyimformation[i].visit_datetime_month
@@ -2089,16 +2089,48 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 						i_brand_e_d < i_brand_e; i_brand_e_d++) {
 					double num_one_day = 0;
 					if (compare(p.p_buyimformation[i_brand_b_d],
-							p.p_buyimformation[i_brand_e_d]) != 0 ) {
-						//意味着有多天查看一件商品
-						double daygapvalue =
-								day_gap(f_m_b, f_d_b,
-										p.p_buyimformation[i_brand_b_d].visit_datetime_month,
-										p.p_buyimformation[i_brand_b_d].visit_datetime_day);
+							p.p_buyimformation[i_brand_e_d]) != 0  || i_brand_e_d == i_brand_e-1) {
+
+						if (i_brand_e_d != i_brand_e - 1) {
+							double daygapvalue =
+									day_gap(f_m_b, f_d_b,
+											p.p_buyimformation[i_brand_b_d].visit_datetime_month,
+											p.p_buyimformation[i_brand_b_d].visit_datetime_day);
+							arry_check[0][num_check_day] = daygapvalue;
+							arry_check[1][num_check_day] = i_brand_e_d-i_brand_b_d;
+							num_check_day++;
+
+						}else{
+							//
+							if(compare(p.p_buyimformation[i_brand_b_d],
+														p.p_buyimformation[i_brand_e_d]) == 0){
+								//最后一个与之前为同一天
+								double daygapvalue =
+										day_gap(f_m_b, f_d_b,
+												p.p_buyimformation[i_brand_b_d].visit_datetime_month,
+												p.p_buyimformation[i_brand_b_d].visit_datetime_day);
+								arry_check[0][num_check_day] = daygapvalue;
+								arry_check[1][num_check_day] = i_brand_e_d-i_brand_b_d+1;
+								num_check_day++;
+							}else{
+								double daygapvalue =
+										day_gap(f_m_b, f_d_b,
+												p.p_buyimformation[i_brand_b_d].visit_datetime_month,
+												p.p_buyimformation[i_brand_b_d].visit_datetime_day);
+								arry_check[0][num_check_day] = daygapvalue;
+								arry_check[1][num_check_day] = i_brand_e_d-i_brand_b_d;
+								num_check_day++;
 
 
-
-
+								daygapvalue =
+										day_gap(f_m_b, f_d_b,
+												p.p_buyimformation[i_brand_e_d].visit_datetime_month,
+												p.p_buyimformation[i_brand_e_d].visit_datetime_day);
+								arry_check[0][num_check_day] = daygapvalue;
+								arry_check[1][num_check_day] = 1;
+								num_check_day++;
+							}
+						}
 
 
 						i_brand_b_d = i_brand_e_d;
@@ -2106,27 +2138,45 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 						i_brand_e_d--;
 					}
 
-//					如果i_brand_e_d == i_brand_e-1说明查看该商品只用了一天
-					if (i_brand_e_d == i_brand_e - 1 && i_brand_b_d == i_brand_b) {
-						double daygapvalue =
-								day_gap(f_m_b, f_d_b,
-										p.p_buyimformation[i_brand_b_d].visit_datetime_month,
-										p.p_buyimformation[i_brand_b_d].visit_datetime_day);
+				}
 
+				//将一个人对商品的查看信息存在数组中，
+				//处理办法：1.以最后一天作为时间原点，离最后一天时间越远的查看系数越小
+				//		2.还要乘以查看间隔时间天数作为权重，比如一个人隔5天后有查看一件商品，说明很有可能购买
+				//		3.最后乘以最后一天距预测时间的权重，比如一个商品最后在4月看的，7月很有可能不买
 
+				//计算购买阈值估计{--------------------------------------------------------------
+				num_over_check_av+= pow(arry_check[1][0],2)/exp(0.6*(num_check_day-1-15.));
+				for(int i=1;i<num_check_day;i++){
 
-
-						num_check_day = 1;
-
-						i_brand_b_d = i_brand_e_d;
-					}
-
-
+					num_over_check_av+= exp(pow((arry_check[0][i-1]-arry_check[0][i]-1),1.5))*pow(arry_check[1][i],2)
+		/exp(0.6*(num_check_day-1-i-15.));
 
 				}
 
-				num_over_check_av /= num_check_day;
+				num_over_check_av /= pow(exp(0.8*(arry_check[0][num_check_day-1]-15.)*double(num_check_day)),2);
+				num_over_check_av = log(num_over_check_av);
+				num_over_check_av /= 50.;
+				//一个人如果一个月都没买，认为其以后也不会买
+				/*
+				if(arry_check[0][0]-arry_check[0][num_check_day-1]< 30 && arry_check[0][0]-arry_check[0][num_check_day-1] > 15)
+					num_over_check_av = 0;
+				*/
 
+				if (num_over_check_av >= 10000){
+					cout<<num_over_check_av<<endl;
+				}
+				//估计}======================================================================
+
+				//branch{-----------------------------------------------------------------------
+				if (num_over_check_av >= 1) {
+					arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
+							p.p_buyimformation[i_brand_b].brand_id;
+					leng_s_a_b_l[i_a_p]++;
+				}
+				//branch}=============================================================
+				//master{--------------------------------------------------------------------------
+				/*
 				if (num_over_check_av >= 1 && (i_brand_e - i_brand_b) >= 2
 						&& daygap < 6) {
 					arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
@@ -2153,8 +2203,8 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 							p.p_buyimformation[i_brand_b].brand_id;
 					leng_s_a_b_l[i_a_p]++;
 				}
-
-
+				*/
+				//master}=========================================================================
 				//一个人查看一直很平均，可能也会购买{--------------------------------------------------
 
 
