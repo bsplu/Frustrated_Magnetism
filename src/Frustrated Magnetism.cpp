@@ -398,7 +398,7 @@ int main() {
 	read_txt(arry_person, leng_s_arry_person);
 
 	//solution4(arry_person, leng_s_arry_person,7,16,8,15);
-	solution4(arry_person, leng_s_arry_person, 8, 16, 9, 15);
+	solution4(arry_person, leng_s_arry_person, 7, 16, 8, 15);
 
 	return 0;
 }
@@ -2151,30 +2151,34 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 
 
 				//计算购买阈值估计{--------------------------------------------------------------
+
 				double daybig = int(double(num_check_day)/5.)+1;
-				num_over_check_av+= pow(arry_check[1][0],2)/pow(1.*(num_check_day/daybig),4);
+				num_over_check_av+= pow(arry_check[1][0],2)/pow(1.*(num_check_day/daybig),1.2);
 				for(int i=1;i<num_check_day;i++){
 
 
-					num_over_check_av+= pow((arry_check[0][i-1]-arry_check[0][i]),3)*pow(arry_check[1][i],2)/pow(1.*((num_check_day-i)/daybig),4);
+					num_over_check_av+= pow((arry_check[0][i-1]-arry_check[0][i]),3)*pow(arry_check[1][i],2)/pow(1.*((num_check_day-i)/daybig),1.2);
 
 
 				}
 
 
-				num_over_check_av =num_over_check_av/ pow(arry_check[0][num_check_day-1],2)*pow(num_check_day,3)/pow(arry_check[0][0]-arry_check[0][num_check_day-1]+1,3);
+				num_over_check_av =num_over_check_av/ (exp((arry_check[0][num_check_day-1])-5)+20.)*pow(num_check_day,3)/pow(arry_check[0][0]-arry_check[0][num_check_day-1]+1,3);
+				//num_over_check_av =num_over_check_av/ (pow(fabs(arry_check[0][num_check_day-1]),1.4)+20)*pow(num_check_day,3)/pow(arry_check[0][0]-arry_check[0][num_check_day-1]+1,3);
+
+				num_over_check_av = num_over_check_av/1.2;
 
 
-				num_over_check_av = num_over_check_av/2.;
 				//一个人如果一个月都没买，认为其以后也不会买
 				/*
 				if(arry_check[0][0]-arry_check[0][num_check_day-1]< 30 && arry_check[0][0]-arry_check[0][num_check_day-1] > 15)
 					num_over_check_av = 0;
 				*/
-
+				/*
 				if (num_over_check_av >= 10000){
 					cout<<num_over_check_av<<endl;
 				}
+				*/
 				//估计}======================================================================
 
 				//branch{-----------------------------------------------------------------------
@@ -2259,7 +2263,7 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 						ifjoinbuylist = true;
 					}
 
-					if (Pbuy_again[2][i_Pbuy_ag] >= 6 ) {
+					if (Pbuy_again[2][i_Pbuy_ag] >= 5 ) {
 						//最后一次的行为是购买{----------------------------------------------------------
 
 						try {
@@ -2330,6 +2334,90 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 
 
 
+
+
+	//刨除掉购买率极低的商品{---------------------------------------------------------------------
+
+	for (int i_a_p = 0; i_a_p < leng_s_arry_person; i_a_p++) {
+		for (int i_a_p_b = 0; i_a_p_b < leng_s_a_b_l[i_a_p]; i_a_p_b++) {
+
+			for (int j = 0; j < len_Pbuy; j++) {
+				//master{---------------------------------------------------------
+
+				if (arry_buy_list[i_a_p][i_a_p_b] == Pbuy[0][j]) {
+
+					if (Pbuy[2][j] >= 60 && Pbuy[1][j] < 0.03) {
+						arry_buy_list[i_a_p][i_a_p_b] = 0;
+						break;
+					} else if (Pbuy[2][j] >= 50 && Pbuy[2][j] < 60
+							&& Pbuy[1][j] < 0.07) {
+						arry_buy_list[i_a_p][i_a_p_b] = 0;
+						break;
+					} else if (Pbuy[2][j] >= 40 && Pbuy[2][j] < 50
+							&& Pbuy[1][j] < 0.1) {
+						arry_buy_list[i_a_p][i_a_p_b] = 0;
+						break;
+					}
+				}
+
+				//master}==========================================================
+				//branch{------------------------------------------------------------
+
+				if (arry_buy_list[i_a_p][i_a_p_b] == Pbuy[0][j]) {
+					/*
+					if (Pbuy[1][j] == 0) {
+						arry_buy_list[i_a_p][i_a_p_b] = 0;
+						break;
+					}
+
+					if (Pbuy[2][j] >= 100 && Pbuy[1][j]*Pbuy[2][j] <= 10) {
+						arry_buy_list[i_a_p][i_a_p_b] = 0;
+						break;
+					}
+
+					else if (Pbuy[2][j] >= 50 && Pbuy[2][j] < 60
+							&& Pbuy[1][j]*Pbuy[2][j] <= 4) {
+						arry_buy_list[i_a_p][i_a_p_b] = 0;
+						break;
+					} else if (Pbuy[2][j] >= 40 && Pbuy[2][j] < 50
+							&& Pbuy[1][j]*Pbuy[2][j] <= 2) {
+						arry_buy_list[i_a_p][i_a_p_b] = 0;
+						break;
+					}
+					*/
+				}
+
+				//branch}============================================================
+			}
+			//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!21110
+
+			if(arry_buy_list[i_a_p][i_a_p_b] == 21146
+				||	arry_buy_list[i_a_p][i_a_p_b] == 	21110
+				||	arry_buy_list[i_a_p][i_a_p_b] == 25687
+				||	arry_buy_list[i_a_p][i_a_p_b] == 5470
+				||	arry_buy_list[i_a_p][i_a_p_b] == 17214){
+				arry_buy_list[i_a_p][i_a_p_b] = 0;
+			}
+
+			/*
+			 * 21146只会在7.8号购买
+			 * 21110基本不会购买
+			 * 1180在8月查看才会购买
+			 * 25687不会购买
+			 * 6571000,5470会买两次，其他人不买
+			 * 17214在8-9月不会买8216500，8845250，5034000
+			 *
+			 */
+		}
+
+	}
+
+	//刨除end}===============================================================================
+
+
+
+	ofstream fout_bl("buylist.txt");
+
 	for (int i_a_p = 0; i_a_p < leng_s_arry_person; i_a_p++) {
 
 		person &p = arry_person[i_a_p];
@@ -2374,7 +2462,7 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 					}
 
 					for (int i = i_brand_b; i < i_brand_e; i++) {
-						cout << i_a_p << "\t"
+						fout_bl << i_a_p << "\t"
 								<< arry_person[i_a_p].get_person_id() << "\t"
 								<< p.p_buyimformation[i].brand_id << "\t"
 								<< p.p_buyimformation[i].type << "\t"
@@ -2400,12 +2488,12 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 						}
 					}
 
-					cout << "-------------------------------------------------"
+					fout_bl << "-------------------------------------------------"
 							<< endl;
 
 					i_brand_b = i_brand_e;
 					i_brand_e--;
-					cout
+					fout_bl
 							<< "======================================================================="
 							<< endl;
 					//system("pause");
@@ -2417,36 +2505,15 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 	}
 
 
+fout_bl.close();
 
 
 
 
-
-
-	//刨除掉购买率极低的商品{---------------------------------------------------------------------
-	for (int i_a_p = 0; i_a_p < leng_s_arry_person; i_a_p++) {
-		for (int i_a_p_b = 0; i_a_p_b < leng_s_a_b_l[i_a_p]; i_a_p_b++) {
-			for (int j = 0; j < len_Pbuy; j++) {
-				if (arry_buy_list[i_a_p][i_a_p_b] == Pbuy[0][j]) {
-
-					if (Pbuy[2][j] >= 60 && Pbuy[1][j] < 0.03) {
-						arry_buy_list[i_a_p][i_a_p_b] = 0;
-						break;
-					} else if (Pbuy[2][j] >= 50 && Pbuy[2][j] < 60
-							&& Pbuy[1][j] < 0.07) {
-						arry_buy_list[i_a_p][i_a_p_b] = 0;
-						break;
-					} else if (Pbuy[2][j] >= 40 && Pbuy[2][j] < 50
-							&& Pbuy[1][j] < 0.1) {
-						arry_buy_list[i_a_p][i_a_p_b] = 0;
-						break;
-					}
-				}
-			}
-		}
-	}
-	//刨除end}===============================================================================
 	cout<<"\n\n没有购买\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"<<endl;
+
+	ofstream fout_nob("nobuy.txt");
+
 	//输出没有购买，但是我提交的商品
 	for(int i_a_p=0;i_a_p<leng_s_arry_person;i_a_p++){
 		person &p = arry_person[i_a_p];
@@ -2462,7 +2529,7 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 				for (int i_b = 0; i_b < arry_person[i_a_p].leng_s_p_buyim;
 						i_b++) {
 					if(arry_buy_list[i_a_p][i_list] ==  arry_person[i_a_p].p_buyimformation[i_b].brand_id){
-						cout << i_a_p << "\t"
+						fout_nob << i_a_p << "\t"
 								<< arry_person[i_a_p].get_person_id() << "\t"
 								<< p.p_buyimformation[i_b].brand_id << "\t"
 								<< p.p_buyimformation[i_b].type << "\t"
@@ -2476,7 +2543,7 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 
 				}
 			}
-			cout<<"-------------------------------------------------------------------------"<<endl;
+			fout_nob<<"-------------------------------------------------------------------------"<<endl;
 		}
 		else{
 			for (int i_list = 0; i_list <  leng_s_a_b_l[i_a_p]; i_list++) {
@@ -2491,7 +2558,7 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 							}
 						}
 						if(!ifbuybrand){
-						cout << i_a_p << "\t"
+							fout_nob << i_a_p << "\t"
 								<< arry_person[i_a_p].get_person_id() << "\t"
 								<< p.p_buyimformation[i_b].brand_id << "\t"
 								<< p.p_buyimformation[i_b].type << "\t"
@@ -2506,12 +2573,13 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 
 				}
 			}
-			cout<<"-------------------------------------------------------------------------"<<endl;
+			fout_nob<<"-------------------------------------------------------------------------"<<endl;
 		}
 
 
-		cout<<"================================================================================"<<endl;
+		fout_nob<<"================================================================================"<<endl;
 	}
+	fout_nob.close();
 	//刨除掉购买率极低的人{------------------------------------------------------------------------
 	/*
 	 for(int i_a_p=0;i_a_p<leng_s_arry_person;i_a_p++){
@@ -3175,8 +3243,13 @@ void findPbuy(person * arry_person_input, int len_arry_person_input,
 	}
 
 	for (int i = 0; i < len_Pbuy; i++) {
+		if(Pbuy[2][i] >20 && Pbuy[1][i] == 0  ){
+			cout<<Pbuy[0][i]<<"\t"<<Pbuy[1][i]<<"\t"<<Pbuy[2][i]<<endl;
 
+		}
 		Pbuy[1][i] /= Pbuy[2][i];
+
+
 
 	}
 
