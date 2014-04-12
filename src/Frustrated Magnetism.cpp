@@ -398,7 +398,7 @@ int main() {
 	read_txt(arry_person, leng_s_arry_person);
 
 	//solution4(arry_person, leng_s_arry_person,7,16,8,15);
-	solution4(arry_person, leng_s_arry_person, 7, 16, 8, 15);
+	solution4(arry_person, leng_s_arry_person, 8, 16, 9, 15);
 
 	return 0;
 }
@@ -1646,30 +1646,26 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 					!= p.p_buyimformation[i_brand_e].brand_id) {
 
 				double T = 0;
-				BuyImformation buy[100];
+				BuyImformation buy;
 				int leng_s_buy = 0;
+				int num_buy_f = 0;//分开的购买次数
 				for (int i = i_brand_b; i < i_brand_e; i++) {
 					if (p.p_buyimformation[i].type == 1) {
 
 						if (leng_s_buy == 0) {
-							buy[leng_s_buy] = p.p_buyimformation[i];
+
+							buy = p.p_buyimformation[i];
 							leng_s_buy+=2+p.p_buyimformation[i].num_buys;
+							num_buy_f++;
 						} else {
-							/*
-							 if (abs(
-							 day_gap(
-							 buy[leng_s_buy - 1].visit_datetime_month,
-							 buy[leng_s_buy - 1].visit_datetime_day,
-							 p.p_buyimformation[i].visit_datetime_month,
-							 p.p_buyimformation[i].visit_datetime_day)) <= 2)
-							 continue;
-							 else {
-							 */
-							buy[leng_s_buy] = p.p_buyimformation[i];
+
+
+							buy = p.p_buyimformation[i];
 							leng_s_buy+=2+p.p_buyimformation[i].num_buys;
+							num_buy_f++;
 							T += day_gap(
-									buy[leng_s_buy - 1].visit_datetime_month,
-									buy[leng_s_buy - 1].visit_datetime_day,
+									buy.visit_datetime_month,
+									buy.visit_datetime_day,
 									p.p_buyimformation[i].visit_datetime_month,
 									p.p_buyimformation[i].visit_datetime_day);
 							//}
@@ -1682,12 +1678,12 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 
 				check_num_total++;
 
-				if (leng_s_buy > 1) {
+				if (num_buy_f > 1 || leng_s_buy >= 3) {//|| leng_s_buy > 3 num_buy_f > 1
 					buy_num_again++;
 
 					//在预测区间，添加到购买列表中
-
-					arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] = buy[0].brand_id;
+					//ev
+					arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] = buy.brand_id;
 					leng_s_a_b_l[i_a_p]++;
 
 					//删除掉该品牌的全部信息
@@ -2057,15 +2053,19 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 					}
 				}
 
-				if ((daygap < 48 && daygap2 >= 4)
-						||
-						 (i_brand_e - i_brand_b) > 9
-								) {
-					//cout<<Pbuy[2][i_Pbuy]<<"\t"<<Pbuy[1][i_Pbuy]<<endl;
+
+
+				if (Pbuy[2][i_Pbuy] >= 10 && Pbuy[1][i_Pbuy] >= 0.07
+						&& daygap < 30) {
+
+					//ev
 					arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
 							p.p_buyimformation[i_brand_b].brand_id;
 					leng_s_a_b_l[i_a_p]++;
+
 				}
+
+
 
 				i_brand_b = i_brand_e;
 				i_brand_e--;
@@ -2183,9 +2183,12 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 
 				//branch{-----------------------------------------------------------------------
 				if (num_over_check_av >= 1) {
+
+					//ev
 					arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
 							p.p_buyimformation[i_brand_b].brand_id;
 					leng_s_a_b_l[i_a_p]++;
+
 				}
 				//branch}=============================================================
 				//master{--------------------------------------------------------------------------
@@ -2271,6 +2274,8 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 									!= p.p_buyimformation[i_brand_e].brand_id) {
 
 								//branch buyagain{---------------------------------------
+
+								//ev
 								arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
 										p.p_buyimformation[i_brand_e].brand_id;
 								leng_s_a_b_l[i_a_p]++;
@@ -2302,14 +2307,14 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 						try {
 							if (p.p_buyimformation[i_brand_e - 1].brand_id
 									== p.p_buyimformation[i_brand_e].brand_id) {
-
+//ev
 								arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
 										p.p_buyimformation[i_brand_e].brand_id;
 								leng_s_a_b_l[i_a_p]++;
 
 							}
 						} catch (...) {
-
+//ev
 							arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
 									p.p_buyimformation[i_brand_e].brand_id;
 							leng_s_a_b_l[i_a_p]++;
