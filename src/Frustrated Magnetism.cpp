@@ -39,8 +39,10 @@ double Sq(double q, int n, double a1) {
 }
 
 void findprivilege(person * arry_person,int len_arry_person,double **arry_Pbuy,int len_Pbuy,int f_m_b,int f_d_b ,int *& arry_pri_brand,int & len_arry_pri_brand);
-void findbuyinBuylist(person* arry_person,int len_arry_person,int **&buylist,int *&len_buylist_ev,int &len_buylist,double **Pbuy,int len_Pbuy);
-
+void findbuyinBuylist(person* arry_person,int len_arry_person
+		,int **&buylist,int *&len_buylist_ev,int &len_buylist
+		,double **Pbuy,int len_Pbuy
+		,int f_m_b,int f_d_b);
 
 class BuyImformation {
 public:
@@ -402,7 +404,7 @@ int main() {
 	read_txt(arry_person, leng_s_arry_person);
 
 	//solution4(arry_person, leng_s_arry_person,7,16,8,15);
-	solution4(arry_person, leng_s_arry_person,7, 16, 8, 15);
+	solution4(arry_person, leng_s_arry_person,8, 16, 9, 15);
 
 	return 0;
 }
@@ -1991,7 +1993,7 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 
 		person &p = arry_person[i_a_p];
 
-		if (arry_person[i_a_p].get_person_id() == 6694750|| i_a_p == 882) {
+		if (arry_person[i_a_p].get_person_id() == 11340250) {
 
 			for (int i = 0; i < arry_person[i_a_p].leng_s_p_buyim; i++) {
 				cout << i << "\t" << p.p_buyimformation[i].brand_id << "\t"
@@ -2167,29 +2169,51 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 				//计算购买阈值估计{--------------------------------------------------------------
 
 //				master{------------------------------------------------------------
-
-//				double daybig = int(double(num_check_day)/5.)+1;
-//				num_over_check_av+= pow(arry_check[1][0],2)/pow(1.*(num_check_day/daybig),1.2);
-//				for(int i=1;i<num_check_day;i++){
+//				int num_gap = 0;
+//				double daybig = int(double(num_check_day) / 5.) + 1;
+//				num_over_check_av += pow(arry_check[1][0], 2.5)
+//						/ pow(1. * (num_check_day / daybig), 1.2)
+//						/ (exp((arry_check[0][0])-5)+10.);
 //
+//				for (int i = 1; i < num_check_day; i++) {
+//					if((arry_check[0][0] - arry_check[0][i])> 10){
+//						num_gap++;
+//					}
 //
-//					num_over_check_av+= pow((arry_check[0][i-1]-arry_check[0][i]),3)*pow(arry_check[1][i],2)/pow(1.*((num_check_day-i)/daybig),1.2);
+//					num_over_check_av +=
+//							pow(
+//							(arry_check[0][0] - arry_check[0][i]), 3)
+//
+//							* pow(arry_check[1][i], 2.5)
+//							/ pow(1. * ((num_check_day - i) / daybig), 1.2)
+//							/ (exp((arry_check[0][i])-5)+10.);
 //
 //
 //				}
 //
+//				num_over_check_av = num_over_check_av
+//						* pow(num_check_day, 3)
+//						/ pow(
+//								arry_check[0][0]
+//										- arry_check[0][num_check_day - 1] + 1,
+//								3)/pow(num_check_day,1)
 //
-//				num_over_check_av =num_over_check_av/ (exp((arry_check[0][num_check_day-1])-5)+20.)*pow(num_check_day,3)/pow(arry_check[0][0]-arry_check[0][num_check_day-1]+1,3);
 //
-//				num_over_check_av = num_over_check_av/1.7;
+//						;
+//
+//				num_over_check_av = num_over_check_av / 1.;
 				//master}===========================================================================
 				//master}===========================================================================
 				//branch1{------------------------------------------------------------------------
 				int num_gap = 0;
 				double daybig = int(double(num_check_day) / 5.) + 1;
+				double moveday = 5.;
+				double cosdaygap = day_gap(f_m_b,f_d_e,4,15)+moveday;
+
 				num_over_check_av += pow(arry_check[1][0], 2.5)
 						/ pow(1. * (num_check_day / daybig), 1.2)
-						/ (exp((arry_check[0][0])-5)+10.);
+						*pow(cos((arry_check[0][0]+moveday)/cosdaygap*3.14159/2.),7);
+
 				for (int i = 1; i < num_check_day; i++) {
 					if((arry_check[0][0] - arry_check[0][i])> 10){
 						num_gap++;
@@ -2201,7 +2225,7 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 
 							* pow(arry_check[1][i], 2.5)
 							/ pow(1. * ((num_check_day - i) / daybig), 1.2)
-							/ (exp((arry_check[0][i])-5)+10.);
+							*pow(cos((arry_check[0][i]+moveday)/cosdaygap*3.14159/2.),7);
 
 
 				}
@@ -2216,7 +2240,7 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 
 						;
 
-				num_over_check_av = num_over_check_av / 1.;
+				num_over_check_av = num_over_check_av / pow(2.,6)*1.1;
 				//branch1}=======================================================================
 
 
@@ -2420,40 +2444,39 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 				//branch{------------------------------------------------------------
 
 				if (arry_buy_list[i_a_p][i_a_p_b] == Pbuy[0][j]) {
-					/*
-					if (Pbuy[1][j] == 0) {
-						arry_buy_list[i_a_p][i_a_p_b] = 0;
-						break;
-					}
 
-					if (Pbuy[2][j] >= 100 && Pbuy[1][j]*Pbuy[2][j] <= 10) {
-						arry_buy_list[i_a_p][i_a_p_b] = 0;
-						break;
-					}
 
-					else if (Pbuy[2][j] >= 50 && Pbuy[2][j] < 60
-							&& Pbuy[1][j]*Pbuy[2][j] <= 4) {
-						arry_buy_list[i_a_p][i_a_p_b] = 0;
-						break;
-					} else if (Pbuy[2][j] >= 40 && Pbuy[2][j] < 50
-							&& Pbuy[1][j]*Pbuy[2][j] <= 2) {
-						arry_buy_list[i_a_p][i_a_p_b] = 0;
-						break;
-					}
-					*/
+//					if (Pbuy[2][j] >= 100 && Pbuy[1][j]*Pbuy[2][j] <= 10) {
+//						arry_buy_list[i_a_p][i_a_p_b] = 0;
+//						break;
+//					}
+
+//					else if (Pbuy[2][j] >= 50 && Pbuy[2][j] < 60
+//							&& Pbuy[1][j]*Pbuy[2][j] <= 4) {
+//						arry_buy_list[i_a_p][i_a_p_b] = 0;
+//						break;
+//					} else if (Pbuy[2][j] >= 40 && Pbuy[2][j] < 50
+//							&& Pbuy[1][j]*Pbuy[2][j] <= 2) {
+//						arry_buy_list[i_a_p][i_a_p_b] = 0;
+//						break;
+//					}
+
 				}
 
 				//branch}============================================================
 			}
 			//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!21110
 
-			if(arry_buy_list[i_a_p][i_a_p_b] == 21146
-				||	arry_buy_list[i_a_p][i_a_p_b] == 	21110
-				||	arry_buy_list[i_a_p][i_a_p_b] == 25687
-				||	arry_buy_list[i_a_p][i_a_p_b] == 5470
-				||	arry_buy_list[i_a_p][i_a_p_b] == 17214){
-				arry_buy_list[i_a_p][i_a_p_b] = 0;
-			}
+//			if(
+//					arry_buy_list[i_a_p][i_a_p_b] == 21146
+//				||	arry_buy_list[i_a_p][i_a_p_b] == 	21110
+//				||	arry_buy_list[i_a_p][i_a_p_b] == 25687
+//				||	arry_buy_list[i_a_p][i_a_p_b] == 5470
+//				||	arry_buy_list[i_a_p][i_a_p_b] == 17214
+
+//				){
+//				arry_buy_list[i_a_p][i_a_p_b] = 0;
+//			}
 
 			/*
 			 * 21146只会在7.8号购买
@@ -2656,25 +2679,29 @@ fout_bl.close();
 
 	//将buy_list转换为arry1形式储存{-----------------------------------------------------------------------
 	//现判断一下len_arry1的大小
+
 	for (int i = 0; i < leng_s_arry_person; i++) {
 		if (leng_s_a_b_l[i] > 0) {
 			len_arry1++;
 		}
 	}
+
 	arry1 = new int *[900];
 	len_arry1_ev = new int[900];
 	int i_arry_buy_list = 0;
 	for(int i=0;i<900;i++){
-		len_arry1_ev[i] = 0;
-		len_arry1_ev[i] = leng_s_a_b_l[i_arry_buy_list] + 1;
-		arry1[i] = new int[leng_s_a_b_l[i_arry_buy_list] + 1+300];
+
+
+		arry1[i] = new int[300];
 	}
+
+
 	for (int i = 0; i < len_arry1; i++) {
 
 		for (; i_arry_buy_list < leng_s_arry_person; i_arry_buy_list++) {
 
 			if (leng_s_a_b_l[i_arry_buy_list] > 0) {
-
+				len_arry1_ev[i] = leng_s_a_b_l[i_arry_buy_list] + 1;
 				arry1[i][0] = arry_person[i_arry_buy_list].get_person_id();
 
 				for (int j = 0; j < leng_s_a_b_l[i_arry_buy_list]; j++) {
@@ -2685,6 +2712,7 @@ fout_bl.close();
 			}
 		}
 	}
+
 
 	//转化end}=========================================================================================
 
@@ -2698,7 +2726,7 @@ fout_bl.close();
 			<< value_score[2] * 100.0 << "%" << endl;
 
 
-	findbuyinBuylist(arry_person,leng_s_arry_person,arry1,len_arry1_ev,len_arry1,Pbuy,len_Pbuy);
+	findbuyinBuylist(arry_person,leng_s_arry_person,arry1,len_arry1_ev,len_arry1,Pbuy,len_Pbuy,f_m_b,f_d_b);
 
 
 
@@ -3738,7 +3766,10 @@ void findprivilege(person * arry_person,int len_arry_person,double **arry_Pbuy,i
 	cout<<"寻找打折优惠商品--->---------->---------->-------->------->"<<endl;
 }
 
-void findbuyinBuylist(person* arry_person,int len_arry_person,int **&buylist,int *&len_buylist_ev,int &len_buylist,double **Pbuy,int len_Pbuy){
+void findbuyinBuylist(person* arry_person,int len_arry_person
+		,int **&buylist,int *&len_buylist_ev,int &len_buylist
+		,double **Pbuy,int len_Pbuy
+		,int f_m_b,int f_d_b){
 
 	cout<<"查找预测中购买较多的商品--------->--------------->--------------->"<<endl;
 	int **brandlist = new int *[2];
@@ -3774,6 +3805,7 @@ void findbuyinBuylist(person* arry_person,int len_arry_person,int **&buylist,int
 	cout<<"\t查找概率较大者"<<endl;
 	cout<<"\t总预测购买数num_buy="<<num_buy<<endl;
 	ofstream fout_num_pr("num_pre.txt");
+
 	for(int i=0;i<len_Pbuy;i++){
 		if(brandlist[1][i]>0){
 			fout_num_pr<<brandlist[0][i]<<"\t"<<brandlist[1][i]<<endl;
@@ -3782,7 +3814,8 @@ void findbuyinBuylist(person* arry_person,int len_arry_person,int **&buylist,int
 	fout_num_pr.close();
 	cout<<"\t输入最小值:"<<endl;
 	int num_min_pre = 0;
-	cin>>num_min_pre;
+	//cin>>num_min_pre;
+	num_min_pre=35;
 
 	cout<<"\t大于最小值"<<num_min_pre<<"的商品有"<<endl;
 	for(int i=0;i<len_Pbuy;i++){
@@ -3790,7 +3823,7 @@ void findbuyinBuylist(person* arry_person,int len_arry_person,int **&buylist,int
 			cout<<brandlist[0][i]<<"\t"<<brandlist[1][i]<<endl;
 		}
 	}
-	system("pause");
+	//system("pause");
 
 
 	cout<<"\t查找完成"<<endl;
@@ -3808,21 +3841,55 @@ void findbuyinBuylist(person* arry_person,int len_arry_person,int **&buylist,int
 		for(int i_a_p=0;i_a_p<len_arry_person;i_a_p++){
 			for(int i_p_b=0;i_p_b<arry_person[i_a_p].leng_s_p_buyim;i_p_b++){
 				if(arry_person[i_a_p].p_buyimformation[i_p_b].brand_id == brand_p){
-					int i=0;
-					for(;i<len_buylist;i++){
-						if(buylist[i][0] == arry_person[i_a_p].get_person_id()){
-							buylist[i][len_buylist_ev[i]] = brand_p;
-							len_buylist_ev[i]++;
+
+					//如果查看日期比较近就认为很有可能购买。
+					int i_check_last = i_p_b;
+					int i_buy_last = -1;
+					for(;i_check_last<arry_person[i_a_p].leng_s_p_buyim;i_check_last++){
+
+						if(arry_person[i_a_p].p_buyimformation[i_check_last].brand_id != brand_p){
+							i_check_last--;
 							break;
 						}
+						if(arry_person[i_a_p].p_buyimformation[i_check_last].type == 1){
+							i_buy_last = i_check_last;
+						}
+
 					}
-					if(i == len_buylist){
-						len_buylist_ev[len_buylist] = 1;
-						buylist[len_buylist][1] = brand_p;
-						buylist[len_buylist][0] = arry_person[i_a_p].get_person_id();
 
+					if((i_buy_last != -1 && day_gap(
+							f_m_b, f_d_b,arry_person[i_a_p].p_buyimformation[i_buy_last].visit_datetime_month,
+							arry_person[i_a_p].p_buyimformation[i_buy_last].visit_datetime_day) >= 10
+							&& day_gap(
+									f_m_b, f_d_b,arry_person[i_a_p].p_buyimformation[i_check_last].visit_datetime_month,
+										arry_person[i_a_p].p_buyimformation[i_check_last].visit_datetime_day)<20)
+							||
+							(i_buy_last == -1
+									&& day_gap(
+								f_m_b, f_d_b,arry_person[i_a_p].p_buyimformation[i_check_last].visit_datetime_month,
+									arry_person[i_a_p].p_buyimformation[i_check_last].visit_datetime_day)>20
+					) ) {
+//						if(i_buy_last == -1){
+//							cout<<i_a_p<<"\t"<<arry_person[i_a_p].get_person_id()<<"\t"<<brand_p<<endl;
+//						}
+						int i = 0;
+						for (; i < len_buylist; i++) {
+							if (buylist[i][0]
+									== arry_person[i_a_p].get_person_id()) {
 
-						len_buylist++;
+								buylist[i][len_buylist_ev[i]] = brand_p;
+								len_buylist_ev[i]++;
+								break;
+							}
+						}
+						if (i == len_buylist) {
+							len_buylist_ev[len_buylist] = 1;
+							buylist[len_buylist][1] = brand_p;
+							buylist[len_buylist][0] =
+									arry_person[i_a_p].get_person_id();
+
+							len_buylist++;
+						}
 					}
 					break;
 				}
