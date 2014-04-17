@@ -43,6 +43,8 @@ void findbuyinBuylist(person* arry_person,int len_arry_person
 		,int **&buylist,int *&len_buylist_ev,int &len_buylist
 		,double **Pbuy,int len_Pbuy
 		,int f_m_b,int f_d_b);
+void brandcheckout(person* arry_person,int len_arry_person,int brand_id,int * brand_im,const int num_day_total);
+void brandchecked(person* arry_person,int len_arry_person,int *& arry_brand,int &len_arry_brand);
 
 class BuyImformation {
 public:
@@ -404,7 +406,7 @@ int main() {
 	read_txt(arry_person, leng_s_arry_person);
 
 	//solution4(arry_person, leng_s_arry_person,7,16,8,15);
-	solution4(arry_person, leng_s_arry_person,8, 16, 9, 15);
+	solution5(arry_person, leng_s_arry_person,7, 16, 8, 15);
 
 	return 0;
 }
@@ -645,9 +647,38 @@ void read_txt(person* &arry_person_inpute, int & leng_s_arry_person) {
 		arry_person_inpute[i] = arry_person[i];
 	}
 }
+int day_month(int month){
 
+	switch (month) {
+		case 4:
+			return 30;
+			break;
+		case 5:
+			return 31;
+			break;
+		case 6:
+			return 30;
+			break;
+		case 7:
+			return 31;
+			break;
+		case 8:
+			return 31;
+			break;
+		case 9:
+			return 30;
+		default:
+			cout<<"no month"<<endl;
+			exit(0);
+			break;
+	}
+
+	return 0;
+}
 //返回两个日期之间的天数间隔
 int day_gap(int month1, int day1, int month2, int day2) {
+
+
 
 	int m_b = month1;
 	int m_s = month2;
@@ -665,7 +696,13 @@ int day_gap(int month1, int day1, int month2, int day2) {
 		return (day1 - day2);
 	}
 
-	return sign * ((m_b - m_s) * 30 - d_s + d_b);
+	int num_day = 0;
+	num_day += day_month(m_s) - d_s;
+	for(int i=m_s+1;i<m_b;i++){
+		num_day += day_month(i);
+	}
+	num_day+= d_b;
+	return sign *num_day;
 
 }
 
@@ -1596,6 +1633,12 @@ void solution3(person * arry_person_input, int leng_s_arry_person_input,
 void solution4(person * arry_person_input, int leng_s_arry_person_input,
 		int f_m_b = 8, int f_d_b = 16, int f_m_e = 9, int f_d_e = 15) {
 
+	for(int i_a_p=0;i_a_p<leng_s_arry_person_input;i_a_p++){
+		//先按id排个序
+		person &p = arry_person_input[i_a_p];
+		BubbleSort(p.p_buyimformation, arry_person_input[i_a_p].leng_s_p_buyim);
+	}
+
 	person * arry_person = new person[leng_s_arry_person_input];
 	int leng_s_arry_person = leng_s_arry_person_input;
 	for (int i = 0; i < leng_s_arry_person; i++) {
@@ -1690,7 +1733,7 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 
 				check_num_total++;
 
-				if (num_buy_f > 1 || leng_s_buy >= 3) {//|| leng_s_buy > 3 num_buy_f > 1
+				if (num_buy_f > 1 || leng_s_buy >= 3 ) {//|| leng_s_buy > 3 num_buy_f > 1
 					buy_num_again++;
 
 					//在预测区间，添加到购买列表中
@@ -2339,7 +2382,7 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 				//估计}======================================================================
 
 				//branch{-----------------------------------------------------------------------
-				if (num_over_check_av >= 1) {
+				if (num_over_check_av >= 1 ) {
 
 					//ev
 					arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
@@ -2428,7 +2471,7 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 
 						try {
 							if (p.p_buyimformation[i_brand_e - 1].brand_id
-									!= p.p_buyimformation[i_brand_e].brand_id) {
+									!= p.p_buyimformation[i_brand_e].brand_id ) {
 
 								//branch buyagain{---------------------------------------
 
@@ -2463,7 +2506,7 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 
 						try {
 							if (p.p_buyimformation[i_brand_e - 1].brand_id
-									== p.p_buyimformation[i_brand_e].brand_id) {
+									== p.p_buyimformation[i_brand_e].brand_id ) {
 //ev
 //								arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
 //										p.p_buyimformation[i_brand_e].brand_id;
@@ -2808,7 +2851,7 @@ fout_bl.close();
 			<< value_score[2] * 100.0 << "%" << endl;
 
 
-	findbuyinBuylist(arry_person,leng_s_arry_person,arry1,len_arry1_ev,len_arry1,Pbuy,len_Pbuy,f_m_b,f_d_b);
+	//findbuyinBuylist(arry_person,leng_s_arry_person,arry1,len_arry1_ev,len_arry1,Pbuy,len_Pbuy,f_m_b,f_d_b);
 
 
 
@@ -2833,9 +2876,16 @@ fout_bl.close();
 void solution5(person * arry_person_input, int leng_s_arry_person_input,
 		int f_m_b = 8, int f_d_b = 16, int f_m_e = 9, int f_d_e = 15) {
 
-	const double C1 = 0.0;		//如果两个用户间没有交集取0.5代替
-	const double C2 = 0.1;		//
 
+
+	for(int i_a_p=0;i_a_p<leng_s_arry_person_input;i_a_p++){
+		//先按id排个序
+		person &p = arry_person_input[i_a_p];
+		BubbleSort(p.p_buyimformation, arry_person_input[i_a_p].leng_s_p_buyim);
+	}
+
+
+	//将arry_personcopy一个副本
 	person * arry_person = new person[leng_s_arry_person_input];
 	int leng_s_arry_person = leng_s_arry_person_input;
 	for (int i = 0; i < leng_s_arry_person; i++) {
@@ -2843,171 +2893,39 @@ void solution5(person * arry_person_input, int leng_s_arry_person_input,
 		arry_person[i].delete_by_day(f_m_b, f_d_b);
 	}
 
-	int ** arry_cnnct;
-	int *len_arry_cnnct_ev;
-	int *buy_num;
 
-	findconnect(arry_person, leng_s_arry_person, arry_cnnct, len_arry_cnnct_ev,
-			buy_num);
+	//将所有brand名查找出来{---------------------------------------------------------------
+	int *arry_brand_id=NULL;
+	int len_arry_brand_id(0);
+	brandchecked(arry_person,leng_s_arry_person,arry_brand_id,len_arry_brand_id);
+	//查找完成}==========================================================================
 
-	//
 	int **arry_buy_list = new int *[leng_s_arry_person];
 	int *leng_s_a_b_l = new int[leng_s_arry_person];
-	int *leng_a_b_l = new int[leng_s_arry_person];
-
-	for (int i = 0; i < leng_s_arry_person; i++) {
-		leng_a_b_l[i] = 1000;
-		leng_s_a_b_l[i] = 0;
-		arry_buy_list[i] = new int[leng_a_b_l[i]];
+	for(int i_a_p =0;i_a_p<leng_s_arry_person;i_a_p++){
+		arry_buy_list[i_a_p] = new int [3000];
+		leng_s_a_b_l[i_a_p] = 0;
 	}
+	//将每一个商品的购买周期和习惯统计出来{-----------------------------------------------------
+	for (int i_a_b_id = 0; i_a_b_id < len_arry_brand_id; i_a_b_id++) {
+		const int num_day_total = day_gap(f_m_b, f_d_b, 4, 15);
+		int brand_im[num_day_total];
+		int brand_id_pr = arry_brand_id[i_a_b_id];
+		brandcheckout(arry_person, leng_s_arry_person, brand_id_pr, brand_im,
+				num_day_total);
 
-	int ** arry2;
-	int * len_arry2_ev = NULL;
-	int len_arry2 = 0;
-
-	chose_kind_from_day(f_m_b, f_d_b, f_m_e, f_d_e, arry_person_input,
-			leng_s_arry_person_input, arry2, len_arry2, len_arry2_ev, 1);
-
-	int * userid = new int[len_arry_cnnct_ev[0] + 1];
-	int len_userid = len_arry_cnnct_ev[0] + 1;
-	userid[0] = 0;
-	for (int i = 1; i < len_arry_cnnct_ev[0] + 1; i++) {
-		userid[i] = arry_cnnct[0][i - 1];
-	}
-	int * buyid = new int[2000];
-	int len_buyid = 0;
-
-	for (int i = 0; i < leng_s_arry_person; i++) {
-		delete[] arry_cnnct[i];
-	}
-	delete[] arry_cnnct;
-	delete[] len_arry_cnnct_ev;
-
-	double ** arry_buy_cnnct_m = new double *[len_userid];
-	for (int i = 0; i < len_userid; i++) {
-		arry_buy_cnnct_m[i] = new double[2000];
-	}
-
-	for (int i = 0; i < len_userid; i++) {
-		BuyImformation *p = arry_person[userid[i]].p_buyimformation;
-		for (int j = 0; j < arry_person[userid[i]].leng_s_p_buyim; j++) {
-			if (p[j].type == 1) {
-
-				int k = 0;
-				for (; k < len_buyid; k++) {
-					if (p[j].brand_id == buyid[k]) {
-						arry_buy_cnnct_m[i][k] = 1;
-						break;
-					}
-				}
-				if (k == len_buyid) {
-					buyid[len_buyid] = p[j].brand_id;
-					arry_buy_cnnct_m[i][len_buyid] = 1;
-					len_buyid++;
-				}
-			}
-		}
-	}
-	int **num_cover = new int *[len_userid];
-	for (int i = 0; i < len_userid; i++) {
-		num_cover[i] = new int[len_userid];
-	}
-
-	for (int i = 0; i < len_userid; i++) {
-		for (int j = i + 1; j < len_userid; j++) {
-			int num_cover_l = 0;
-			for (int k = 0; k < len_buyid; k++) {
-				if (arry_buy_cnnct_m[i][k] + arry_buy_cnnct_m[j][k] == 2)
-					num_cover_l++;
-			}
-			num_cover[i][j] = num_cover_l;
-			num_cover[j][i] = num_cover_l;
-		}
-	}
-	//对于每一个人筛选
-#pragma omp parallel for
-	for (int i_a = 0; i_a < len_userid; i_a++) {
-
-		//对于每一件商品
-		for (int i_br = 0; i_br < len_buyid; i_br++) {
-
-			if (arry_buy_cnnct_m[i_a][i_br] == 1)
-				continue;
-			double rio = 0;
-			for (int i_b = 0; i_b < len_userid; i_b++) {
-				if (i_a == i_b)
-					continue;
-				//cout<<num_cover[i_a][i_b]<<endl;
-				if (arry_buy_cnnct_m[i_b][i_br] == 1)
-					rio += pow(double(num_cover[i_a][i_b]), 2)
-							/ double(buy_num[i_b]);
-
-			}
-			rio *= 0.1 * double(buy_num[i_a]);
-			if (rio >= 0.5) {
-				int i_a_p = userid[i_a];
-
-				arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] = buyid[i_br];
-				leng_s_a_b_l[i_a_p]++;
-			}
-		}
 
 	}
 
-	for (int i = 0; i < len_userid; i++) {
-		delete[] num_cover[i];
 
+
+
+
+	for(int i_a_p =0;i_a_p<leng_s_arry_person;i_a_p++){
+		delete []arry_buy_list[i_a_p];
 	}
-	delete[] num_cover;
-
-	for (int i = 0; i < len_userid; i++) {
-		delete[] arry_buy_cnnct_m[i];
-	}
-	delete[] arry_buy_cnnct_m;
-	delete[] userid;
-	delete[] buyid;
-
-	int ** arry1;
-	int * len_arry1_ev = NULL;
-	int len_arry1 = 0;
-
-	//将buy_list转换为arry1形式储存{-----------------------------------------------------------------------
-	//现判断一下len_arry1的大小
-	for (int i = 0; i < leng_s_arry_person; i++) {
-		if (leng_s_a_b_l[i] > 0) {
-			len_arry1++;
-		}
-	}
-	arry1 = new int *[len_arry1];
-	len_arry1_ev = new int[len_arry1];
-	int i_arry_buy_list = 0;
-	for (int i = 0; i < len_arry1; i++) {
-		len_arry1_ev[i] = 0;
-		for (; i_arry_buy_list < leng_s_arry_person; i_arry_buy_list++) {
-			if (leng_s_a_b_l[i_arry_buy_list] > 0) {
-				int len_local = leng_s_a_b_l[i_arry_buy_list];
-				len_arry1_ev[i] = len_local + 1;
-				arry1[i] = new int[len_local + 1];
-				arry1[i][0] = arry_person[i_arry_buy_list].get_person_id();
-
-				for (int j = 0; j < leng_s_a_b_l[i_arry_buy_list]; j++) {
-					arry1[i][j + 1] = arry_buy_list[i_arry_buy_list][j];
-				}
-				i_arry_buy_list++;
-				break;
-			}
-		}
-	}
-
-	//转化end}=========================================================================================
-
-	check_arry_re(arry1, len_arry1, len_arry1_ev);
-
-	double * value_score = NULL;
-	value_score = score(arry1, len_arry1_ev, len_arry1, arry2, len_arry2_ev,
-			len_arry2);
-	cout << value_score[0] * 100.0 << "%\t" << value_score[1] * 100.0 << "%\t"
-			<< value_score[2] * 100.0 << "%" << endl;
+	delete []arry_buy_list;
+	delete []leng_s_a_b_l;
 
 }
 
@@ -3438,6 +3356,7 @@ void findPbuy(person * arry_person_input, int len_arry_person_input,
 	}
 
 	delete[] arry_person;
+	cout<<"len_Pbuy="<<len_Pbuy<<endl;
 	cout<<"findPbuy----->------->------>--------->"<<endl;
 }
 
@@ -3980,4 +3899,52 @@ void findbuyinBuylist(person* arry_person,int len_arry_person
 	delete []brandlist[0];
 	delete []brandlist[1];
 	cout<<"查找预测中购买较多的商品--------->--------------->--------------->"<<endl;
+}
+
+void brandcheckout(person* arry_person,int len_arry_person,int brand_id,int * brand_im,const int num_day_total){
+
+	cout<<"将单个brand查看信息统计出来------------------------------------->"<<endl;
+	//先将brand_im初始化一下
+	for(int i=0;i<num_day_total;i++){
+		brand_im[i] = 0;
+	}
+
+	for(int i_a_p=0;i_a_p<len_arry_person;i_a_p++){
+		BuyImformation * p = arry_person[i_a_p].p_buyimformation;
+		for(int i_a_b=0;i_a_b<arry_person[i_a_p].leng_s_p_buyim;i_a_b++){
+			if(p[i_a_b].brand_id == brand_id){
+				int daygap = day_gap(p[i_a_b].visit_datetime_month,p[i_a_b].visit_datetime_month,4,15);
+				brand_im[daygap]+= p[i_a_b].type == 1?10:1;
+			}
+		}
+	}
+	cout<<"单个brand查找完成---------------------------------------------<"<<endl;
+}
+
+//返回所有brand名
+void brandchecked(person* arry_person,int len_arry_person,int *& arry_brand,int &len_arry_brand){
+
+	//cout<<"将brind名找出来-------------------------------------->"<<endl;
+	arry_brand = new int [10000];
+	len_arry_brand = 0;
+
+	for(int i_a_p=0;i_a_p<len_arry_person;i_a_p++){
+		BuyImformation * p = arry_person[i_a_p].p_buyimformation;
+		for(int i_a_b=0;i_a_b<arry_person[i_a_p].leng_s_p_buyim;i_a_b++){
+			bool TFjoin = false;
+			int brind_p = p[i_a_b].brand_id;
+			for(int iab=0;iab<len_arry_brand;iab++){
+				if(brind_p == arry_brand[iab]){
+					TFjoin = true;
+					break;
+				}
+			}
+			if(!TFjoin){
+				arry_brand[len_arry_brand] = brind_p;
+				len_arry_brand++;
+			}
+		}
+	}
+
+	//cout<<"查找完成---------------------------------------------<"<<endl;
 }
