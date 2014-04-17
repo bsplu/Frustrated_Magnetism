@@ -17,6 +17,7 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#pragma warning(disable:4996) //全部关掉
 
 using namespace std;
 
@@ -45,6 +46,8 @@ void findbuyinBuylist(person* arry_person,int len_arry_person
 		,int f_m_b,int f_d_b);
 void brandcheckout(person* arry_person,int len_arry_person,int brand_id,int * brand_im,const int num_day_total);
 void brandchecked(person* arry_person,int len_arry_person,int *& arry_brand,int &len_arry_brand);
+
+void findpeak(int* brd_arr, int len);
 
 class BuyImformation {
 public:
@@ -417,10 +420,9 @@ double randoms(double b = 0.0, double e = 1.0) {
 }
 
 void read_txt(person* &arry_person_inpute, int & leng_s_arry_person) {
-
+	cout << "读文本中" << endl;
 	FILE* fp;
-
-	if ((fp = fopen("t_alibaba_data.csv", "r")) < 0) {
+	if ((fp = fopen("t_alibaba_data.csv", "r"))<0) { 
 		printf("open the file is error!\n");
 		exit(0);
 	}
@@ -646,6 +648,7 @@ void read_txt(person* &arry_person_inpute, int & leng_s_arry_person) {
 	for (int i = 0; i < leng_s_arry_person; i++) {
 		arry_person_inpute[i] = arry_person[i];
 	}
+	cout << "读取完成" << endl;
 }
 int day_month(int month){
 
@@ -2907,15 +2910,27 @@ void solution5(person * arry_person_input, int leng_s_arry_person_input,
 		leng_s_a_b_l[i_a_p] = 0;
 	}
 	//将每一个商品的购买周期和习惯统计出来{-----------------------------------------------------
-	for (int i_a_b_id = 0; i_a_b_id < len_arry_brand_id; i_a_b_id++) {
-		const int num_day_total = day_gap(f_m_b, f_d_b, 4, 15);
-		int brand_im[num_day_total];
+	/*for (int i_a_b_id = 0; i_a_b_id < len_arry_brand_id; i_a_b_id++) {
+		int num_day_total = day_gap(f_m_b, f_d_b, 4, 15)+1;
+		int *brand_im=new int [num_day_total];
 		int brand_id_pr = arry_brand_id[i_a_b_id];
 		brandcheckout(arry_person, leng_s_arry_person, brand_id_pr, brand_im,
 				num_day_total);
 
+		delete [] brand_im;
+	}*/
+	//------------------------------------------------------
+	int i_a_b_id = 56;
+	int num_day_total = day_gap(f_m_b, f_d_b, 4, 15) + 1;
+	int *brand_im = new int[num_day_total];
+	int brand_id_pr = arry_brand_id[i_a_b_id];
+	cout << brand_id_pr << endl;
+	brandcheckout(arry_person, leng_s_arry_person, brand_id_pr, brand_im,
+		num_day_total);
+	findpeak(brand_im, num_day_total);
 
-	}
+	delete[] brand_im;
+	//------------------------------------------------------
 
 
 
@@ -3903,7 +3918,7 @@ void findbuyinBuylist(person* arry_person,int len_arry_person
 
 void brandcheckout(person* arry_person,int len_arry_person,int brand_id,int * brand_im,const int num_day_total){
 
-	cout<<"将单个brand查看信息统计出来------------------------------------->"<<endl;
+	//cout<<"将单个brand查看信息统计出来------------------------------------->"<<endl;
 	//先将brand_im初始化一下
 	for(int i=0;i<num_day_total;i++){
 		brand_im[i] = 0;
@@ -3914,17 +3929,17 @@ void brandcheckout(person* arry_person,int len_arry_person,int brand_id,int * br
 		for(int i_a_b=0;i_a_b<arry_person[i_a_p].leng_s_p_buyim;i_a_b++){
 			if(p[i_a_b].brand_id == brand_id){
 				int daygap = day_gap(p[i_a_b].visit_datetime_month,p[i_a_b].visit_datetime_month,4,15);
-				brand_im[daygap]+= p[i_a_b].type == 1?10:1;
+				brand_im[daygap]+= p[i_a_b].type == 1?10000:1;
 			}
 		}
 	}
-	cout<<"单个brand查找完成---------------------------------------------<"<<endl;
+	//cout<<"单个brand查找完成---------------------------------------------<"<<endl;
 }
 
 //返回所有brand名
 void brandchecked(person* arry_person,int len_arry_person,int *& arry_brand,int &len_arry_brand){
 
-	//cout<<"将brind名找出来-------------------------------------->"<<endl;
+	cout<<"将brind名找出来-------------------------------------->"<<endl;
 	arry_brand = new int [10000];
 	len_arry_brand = 0;
 
@@ -3946,5 +3961,15 @@ void brandchecked(person* arry_person,int len_arry_person,int *& arry_brand,int 
 		}
 	}
 
-	//cout<<"查找完成---------------------------------------------<"<<endl;
+	cout<<"查找完成---------------------------------------------<"<<endl;
+}
+
+void findpeak(int* brd_arr, int len)
+{
+	ofstream save_file("findpeak.txt", ios::app);//在文档后追加
+	for (int i = 0; i < len; i++)
+	{
+		save_file << brd_arr[i] << endl;
+	}
+	save_file << "------------------" << endl;
 }
