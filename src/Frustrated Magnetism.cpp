@@ -542,6 +542,7 @@ void read_txt(person* &arry_person_inpute, int & leng_s_arry_person) {
 								&& (p_buyim_local.p_buyimformation[i].type == 0
 										|| p_buyim_local.p_buyimformation[i].type
 												== 3)) {
+							/*
 							//满足同天购买 查看加购物车条件，将该条删除
 
 							for (int j = 0;
@@ -576,7 +577,7 @@ void read_txt(person* &arry_person_inpute, int & leng_s_arry_person) {
 							}
 
 							i--;
-
+							*/
 						} else if (p_buyim_local.p_buyimformation[i].brand_id
 								== buybrand_id
 								&& p_buyim_local.p_buyimformation[i].visit_datetime_month
@@ -585,6 +586,7 @@ void read_txt(person* &arry_person_inpute, int & leng_s_arry_person) {
 										== buyday
 								&& p_buyim_local.p_buyimformation[i].type == 1
 								&& i != i_brand_id) {
+							/*
 							//一天中多次购买一样商品也会删除掉
 							for (int j = 0;
 									j
@@ -617,6 +619,7 @@ void read_txt(person* &arry_person_inpute, int & leng_s_arry_person) {
 							}
 							i--;
 
+						*/
 						}
 					}
 
@@ -3928,7 +3931,9 @@ void brandcheckout(person* arry_person,int len_arry_person,int brand_id,int * br
 		BuyImformation * p = arry_person[i_a_p].p_buyimformation;
 		for(int i_a_b=0;i_a_b<arry_person[i_a_p].leng_s_p_buyim;i_a_b++){
 			if(p[i_a_b].brand_id == brand_id){
-				int daygap = day_gap(p[i_a_b].visit_datetime_month,p[i_a_b].visit_datetime_month,4,15);
+				cout<<p[i_a_b].visit_datetime_month<<"\t"<<p[i_a_b].visit_datetime_day<<endl;
+				int daygap = day_gap(p[i_a_b].visit_datetime_month,p[i_a_b].visit_datetime_day,4,15);
+				cout<<daygap<<endl;
 				brand_im[daygap]+= p[i_a_b].type == 1?10000:1;
 			}
 		}
