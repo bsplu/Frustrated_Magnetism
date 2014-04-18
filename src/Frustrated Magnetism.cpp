@@ -48,6 +48,7 @@ void brandcheckout(person* arry_person,int len_arry_person,int brand_id,int * br
 void brandchecked(person* arry_person,int len_arry_person,int *& arry_brand,int &len_arry_brand);
 
 void findpeak(int* brd_arr, int len);
+void findthreshold(person personi);
 
 class BuyImformation {
 public:
@@ -409,7 +410,7 @@ int main() {
 	read_txt(arry_person, leng_s_arry_person);
 
 	//solution4(arry_person, leng_s_arry_person,7,16,8,15);
-	solution5(arry_person, leng_s_arry_person,7, 16, 8, 15);
+	solution5(arry_person, leng_s_arry_person,8, 16, 9, 15);
 
 	return 0;
 }
@@ -542,7 +543,7 @@ void read_txt(person* &arry_person_inpute, int & leng_s_arry_person) {
 								&& (p_buyim_local.p_buyimformation[i].type == 0
 										|| p_buyim_local.p_buyimformation[i].type
 												== 3)) {
-							/*
+
 							//满足同天购买 查看加购物车条件，将该条删除
 
 							for (int j = 0;
@@ -577,7 +578,7 @@ void read_txt(person* &arry_person_inpute, int & leng_s_arry_person) {
 							}
 
 							i--;
-							*/
+
 						} else if (p_buyim_local.p_buyimformation[i].brand_id
 								== buybrand_id
 								&& p_buyim_local.p_buyimformation[i].visit_datetime_month
@@ -586,7 +587,7 @@ void read_txt(person* &arry_person_inpute, int & leng_s_arry_person) {
 										== buyday
 								&& p_buyim_local.p_buyimformation[i].type == 1
 								&& i != i_brand_id) {
-							/*
+
 							//一天中多次购买一样商品也会删除掉
 							for (int j = 0;
 									j
@@ -619,7 +620,7 @@ void read_txt(person* &arry_person_inpute, int & leng_s_arry_person) {
 							}
 							i--;
 
-						*/
+
 						}
 					}
 
@@ -2890,6 +2891,17 @@ void solution5(person * arry_person_input, int leng_s_arry_person_input,
 		BubbleSort(p.p_buyimformation, arry_person_input[i_a_p].leng_s_p_buyim);
 	}
 
+	/*
+	ofstream fout_da("alibaba_data_bubble.txt");
+	for(int i_a_p=0;i_a_p<leng_s_arry_person_input;i_a_p++){
+		for(int i_a_b=0;i_a_b<arry_person_input[i_a_p].leng_s_p_buyim;i_a_b++){
+			BuyImformation &p = arry_person_input[i_a_p].p_buyimformation[i_a_b];
+			fout_da<<arry_person_input[i_a_p].get_person_id()<<","<<p.brand_id<<","<<p.type<<","
+					<<p.visit_datetime_month<<"月"<<p.visit_datetime_day<<"日"<<endl;
+		}
+	}
+	*/
+
 
 	//将arry_personcopy一个副本
 	person * arry_person = new person[leng_s_arry_person_input];
@@ -2923,19 +2935,28 @@ void solution5(person * arry_person_input, int leng_s_arry_person_input,
 		delete [] brand_im;
 	}*/
 	//------------------------------------------------------
-	int i_a_b_id = 56;
-	int num_day_total = day_gap(f_m_b, f_d_b, 4, 15) + 1;
-	int *brand_im = new int[num_day_total];
-	int brand_id_pr = arry_brand_id[i_a_b_id];
-	cout << brand_id_pr << endl;
-	brandcheckout(arry_person, leng_s_arry_person, brand_id_pr, brand_im,
-		num_day_total);
-	findpeak(brand_im, num_day_total);
+//
+//	int i_a_b_id = 0;
+//	int num_day_total = day_gap(f_m_b, f_d_b, 4, 15) + 1;
+//	int *brand_im = new int[num_day_total];
+//	int brand_id_pr = arry_brand_id[i_a_b_id];
+//
+//	brand_id_pr = 7552;
+//	cout << brand_id_pr << endl;
+//	brandcheckout(arry_person, leng_s_arry_person, brand_id_pr, brand_im,
+//		num_day_total);
+//
+//	findpeak(brand_im, num_day_total);
+//
+//	delete[] brand_im;
 
-	delete[] brand_im;
 	//------------------------------------------------------
 
 
+	for(int i_a_p = 0;i_a_p<leng_s_arry_person;i_a_p++){
+		cout<<arry_person[i_a_p].get_person_id()<<endl;
+			findthreshold(arry_person[i_a_p]);
+	}
 
 
 
@@ -3976,5 +3997,89 @@ void findpeak(int* brd_arr, int len)
 	{
 		save_file << brd_arr[i] << endl;
 	}
+	save_file << "------------------" << endl;
+}
+
+
+//需找一个人的查看阈值
+void findthreshold(person personi){
+
+	ofstream save_file("findthreshold.txt", ios::app);//在文档后追加
+
+
+	int brand_id_p = personi.p_buyimformation[0].brand_id;
+	int i_from_brand = 0;
+	int i_to_brand = 0;
+
+	do{
+	for(;i_to_brand<personi.leng_s_p_buyim;i_to_brand++){
+		if(personi.p_buyimformation[i_to_brand].brand_id != brand_id_p){
+			break;
+		}
+	}
+
+	int i_buy = i_from_brand;
+	for(;i_buy<i_to_brand;i_buy++){
+		if(personi.p_buyimformation[i_buy].type == 1){
+			break;
+		}
+	}
+
+	if(i_buy == i_to_brand){
+		//没有购买
+		/*
+		if(i_buy - i_from_brand > 1){
+		int daygap_f = -1;
+		int num_check = 0;
+		for(int i=i_from_brand;i<i_buy;i++){
+			if(day_gap(personi.p_buyimformation[i].visit_datetime_month,personi.p_buyimformation[i].visit_datetime_day,4,15) > daygap_f){
+				daygap_f= day_gap(personi.p_buyimformation[i].visit_datetime_month,personi.p_buyimformation[i].visit_datetime_day,4,15);
+				if(num_check != 0){
+				save_file<<daygap_f<<"\t"<<num_check<<endl;
+
+				}
+				num_check += 1;
+
+			}else{
+				num_check += 1;
+			}
+
+		}
+		save_file<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"<<endl;
+
+		}
+		*/
+		save_file<< brand_id_p<<"\t" << i_to_brand	- i_from_brand <<endl;
+	}else{
+		//-------------------------------------------------
+		/*
+		if(i_buy - i_from_brand > 1){
+		int daygap_f = -1;
+		int num_check = 0;
+		for(int i=i_from_brand;i<i_buy;i++){
+			if(day_gap(personi.p_buyimformation[i].visit_datetime_month,personi.p_buyimformation[i].visit_datetime_day,4,15) > daygap_f){
+				daygap_f= day_gap(personi.p_buyimformation[i].visit_datetime_month,personi.p_buyimformation[i].visit_datetime_day,4,15);
+				if(num_check != 0){
+				save_file<<daygap_f<<"\t"<<num_check<<endl;
+
+				}
+				num_check += 1;
+
+			}else{
+				num_check += 1;
+			}
+
+		}
+		save_file<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"<<endl;
+
+		}
+		*/
+		//-------------------------------------------------
+		save_file<<  brand_id_p<<"\t"<< -1*(i_buy - i_from_brand) <<endl;
+	}
+	brand_id_p = personi.p_buyimformation[i_to_brand].brand_id;
+	i_from_brand = i_to_brand;
+	}while(i_from_brand<personi.leng_s_p_buyim);
+
 	save_file << "------------------" << endl;
 }
