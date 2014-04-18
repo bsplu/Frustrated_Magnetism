@@ -4004,8 +4004,9 @@ void findpeak(int* brd_arr, int len)
 //需找一个人的查看阈值
 void findthreshold(person personi){
 
-	ofstream save_file("findthreshold.txt", ios::app);//在文档后追加
-
+	ofstream save_fileb("findthresholdb.txt",ios::app);//在文档后追加
+	ofstream save_filen("findthresholdn.txt",ios::app);
+	save_fileb<<personi.get_person_id()<<"------------------>"<<endl;
 
 	int brand_id_p = personi.p_buyimformation[0].brand_id;
 	int i_from_brand = 0;
@@ -4013,6 +4014,7 @@ void findthreshold(person personi){
 
 	do{
 	for(;i_to_brand<personi.leng_s_p_buyim;i_to_brand++){
+		//cout<<i_to_brand<<"\t"<<personi.p_buyimformation[i_to_brand].type<<endl;
 		if(personi.p_buyimformation[i_to_brand].brand_id != brand_id_p){
 			break;
 		}
@@ -4020,6 +4022,7 @@ void findthreshold(person personi){
 
 	int i_buy = i_from_brand;
 	for(;i_buy<i_to_brand;i_buy++){
+
 		if(personi.p_buyimformation[i_buy].type == 1){
 			break;
 		}
@@ -4027,59 +4030,71 @@ void findthreshold(person personi){
 
 	if(i_buy == i_to_brand){
 		//没有购买
-		/*
-		if(i_buy - i_from_brand > 1){
+
+
+		if(i_buy - i_from_brand > 0){
+			save_filen<<personi.p_buyimformation[i_from_brand].brand_id<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~>"<<endl;
 		int daygap_f = -1;
 		int num_check = 0;
 		for(int i=i_from_brand;i<i_buy;i++){
 			if(day_gap(personi.p_buyimformation[i].visit_datetime_month,personi.p_buyimformation[i].visit_datetime_day,4,15) > daygap_f){
-				daygap_f= day_gap(personi.p_buyimformation[i].visit_datetime_month,personi.p_buyimformation[i].visit_datetime_day,4,15);
 				if(num_check != 0){
-				save_file<<daygap_f<<"\t"<<num_check<<endl;
+				save_filen<<daygap_f<<"\t"<<num_check<<endl;
 
 				}
-				num_check += 1;
+				daygap_f= day_gap(personi.p_buyimformation[i].visit_datetime_month,personi.p_buyimformation[i].visit_datetime_day,4,15);
+
+				num_check = 1;
 
 			}else{
 				num_check += 1;
 			}
 
-		}
-		save_file<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"<<endl;
 
 		}
-		*/
-		save_file<< brand_id_p<<"\t" << i_to_brand	- i_from_brand <<endl;
+		save_filen<<daygap_f<<"\t"<<num_check<<endl;
+
+
+		}
+
+
+		//save_file<< brand_id_p<<"\t" << i_to_brand	- i_from_brand <<endl;
 	}else{
 		//-------------------------------------------------
-		/*
-		if(i_buy - i_from_brand > 1){
+
+		if(i_buy - i_from_brand > 0){
+			save_fileb<<personi.p_buyimformation[i_from_brand].brand_id<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~>"<<endl;
 		int daygap_f = -1;
 		int num_check = 0;
 		for(int i=i_from_brand;i<i_buy;i++){
 			if(day_gap(personi.p_buyimformation[i].visit_datetime_month,personi.p_buyimformation[i].visit_datetime_day,4,15) > daygap_f){
-				daygap_f= day_gap(personi.p_buyimformation[i].visit_datetime_month,personi.p_buyimformation[i].visit_datetime_day,4,15);
 				if(num_check != 0){
-				save_file<<daygap_f<<"\t"<<num_check<<endl;
+				save_fileb<<daygap_f<<"\t"<<num_check<<endl;
 
 				}
-				num_check += 1;
+				daygap_f= day_gap(personi.p_buyimformation[i].visit_datetime_month,personi.p_buyimformation[i].visit_datetime_day,4,15);
+
+				num_check = 1;
 
 			}else{
 				num_check += 1;
 			}
 
-		}
-		save_file<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"<<endl;
 
 		}
-		*/
+		save_fileb<<daygap_f<<"\t"<<num_check<<endl;
+
+
+		}
+
+
 		//-------------------------------------------------
-		save_file<<  brand_id_p<<"\t"<< -1*(i_buy - i_from_brand) <<endl;
+		//save_file<<  brand_id_p<<"\t"<< -1*(i_buy - i_from_brand) <<endl;
 	}
 	brand_id_p = personi.p_buyimformation[i_to_brand].brand_id;
 	i_from_brand = i_to_brand;
 	}while(i_from_brand<personi.leng_s_p_buyim);
 
-	save_file << "------------------" << endl;
+	save_fileb << "<------------------" << endl;
+	save_filen << "<------------------" << endl;
 }
