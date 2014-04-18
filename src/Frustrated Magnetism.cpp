@@ -51,7 +51,8 @@ void findpeak(int* brd_arr, int len);
 void findthreshold(person personi,
 		int f_m_b,int f_d_b,int f_m_e,int f_d_e);
 void findthreshold2(person personi,
-		int f_m_b,int f_d_b,int f_m_e,int f_d_e);
+		int f_m_b,int f_d_b,int f_m_e,int f_d_e
+		,int *& buylist,int& len_buylist);
 double fit(double *x,double *y,int num_n);
 
 class BuyImformation {
@@ -2396,9 +2397,9 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 				if (num_over_check_av >= 1 ) {
 
 					//ev
-					arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
-							p.p_buyimformation[i_brand_b].brand_id;
-					leng_s_a_b_l[i_a_p]++;
+//					arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
+//							p.p_buyimformation[i_brand_b].brand_id;
+//					leng_s_a_b_l[i_a_p]++;
 
 				}
 				//branch}=============================================================
@@ -2541,6 +2542,7 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 			}
 		}
 
+		findthreshold2(arry_person[i_a_p],f_m_b,f_d_b,f_m_e,f_d_e,arry_buy_list[i_a_p],leng_s_a_b_l[i_a_p]);
 	}
 
 	//查看次数}=====================================================================================
@@ -2958,8 +2960,10 @@ void solution5(person * arry_person_input, int leng_s_arry_person_input,
 
 
 	for(int i_a_p = 0;i_a_p<leng_s_arry_person;i_a_p++){
+
 		cout<<arry_person[i_a_p].get_person_id()<<endl;
-			findthreshold2(arry_person[i_a_p],7,16,8,15);
+			findthreshold(arry_person[i_a_p],7,16,8,15);
+
 	}
 
 
@@ -4027,11 +4031,14 @@ void findthreshold(person personi,
 
 	int i_buy = i_from_brand;
 	for(;i_buy<i_to_brand;i_buy++){
-
+//		cout<<brand_id_p<<"\t"<<personi.p_buyimformation[i_buy].type<<"\t"<<
+//				personi.p_buyimformation[i_buy].visit_datetime_month<<"."<<
+//				personi.p_buyimformation[i_buy].visit_datetime_day<<endl;
 		if(personi.p_buyimformation[i_buy].type == 1){
 			break;
 		}
 	}
+//cout<<"-----------------------------------------------------"<<endl;
 
 	if(i_buy == i_to_brand){
 		//没有购买
@@ -4113,8 +4120,8 @@ void findthreshold(person personi,
 
 //需找一个人的查看阈值
 void findthreshold2(person personi,
-		int f_m_b,int f_d_b,int f_m_e,int f_d_e){
-		//,int *& buylist,int& len_buylist){
+		int f_m_b,int f_d_b,int f_m_e,int f_d_e
+		,int *& buylist,int& len_buylist){
 
 	ofstream save_fileb("findthresholdb.txt",ios::app);//在文档后追加
 	ofstream save_filen("findthresholdn.txt",ios::app);
@@ -4180,9 +4187,18 @@ void findthreshold2(person personi,
 		double r_check = 0;
 		r_check=fit(arry_check[0],arry_check[1],len_arry_check);
 		save_filen<<"r="<<r_check<<endl;
+		bool TFfit = false;
+		if(r_check <0.7 || (r_check >0.87 && r_check < 0.94) || r_check > 0.98){
+			TFfit =true;
+		}
+		if(len_arry_check>=3 && TFfit && arry_check[0][len_arry_check-1]>60){
+			buylist[len_buylist] = brand_id_p;
+			len_buylist++;
+		}
 
 		//save_file<< brand_id_p<<"\t" << i_to_brand	- i_from_brand <<endl;
 	}else{
+		/*
 		len_arry_check = 0;
 		//-------------------------------------------------
 		BuyImformation begin_day,end_day;
@@ -4229,7 +4245,7 @@ void findthreshold2(person personi,
 	}
 		//-------------------------------------------------
 		//save_file<<  brand_id_p<<"\t"<< -1*(i_buy - i_from_brand) <<endl;
-	}
+	*/}
 	brand_id_p = personi.p_buyimformation[i_to_brand].brand_id;
 	i_from_brand = i_to_brand;
 	}while(i_from_brand<personi.leng_s_p_buyim);
