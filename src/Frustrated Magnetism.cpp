@@ -48,7 +48,11 @@ void brandcheckout(person* arry_person,int len_arry_person,int brand_id,int * br
 void brandchecked(person* arry_person,int len_arry_person,int *& arry_brand,int &len_arry_brand);
 
 void findpeak(int* brd_arr, int len);
-void findthreshold(person personi);
+void findthreshold(person personi,
+		int f_m_b,int f_d_b,int f_m_e,int f_d_e);
+void findthreshold2(person personi,
+		int f_m_b,int f_d_b,int f_m_e,int f_d_e);
+double fit(double *x,double *y,int num_n);
 
 class BuyImformation {
 public:
@@ -2955,7 +2959,7 @@ void solution5(person * arry_person_input, int leng_s_arry_person_input,
 
 	for(int i_a_p = 0;i_a_p<leng_s_arry_person;i_a_p++){
 		cout<<arry_person[i_a_p].get_person_id()<<endl;
-			findthreshold(arry_person[i_a_p]);
+			findthreshold2(arry_person[i_a_p],7,16,8,15);
 	}
 
 
@@ -4002,12 +4006,13 @@ void findpeak(int* brd_arr, int len)
 
 
 //需找一个人的查看阈值
-void findthreshold(person personi){
+void findthreshold(person personi,
+		int f_m_b,int f_d_b,int f_m_e,int f_d_e){
 
 	ofstream save_fileb("findthresholdb.txt",ios::app);//在文档后追加
 	ofstream save_filen("findthresholdn.txt",ios::app);
 	save_fileb<<personi.get_person_id()<<"------------------>"<<endl;
-
+	save_filen<<personi.get_person_id()<<"------------------>"<<endl;
 	int brand_id_p = personi.p_buyimformation[0].brand_id;
 	int i_from_brand = 0;
 	int i_to_brand = 0;
@@ -4061,7 +4066,14 @@ void findthreshold(person personi){
 		//save_file<< brand_id_p<<"\t" << i_to_brand	- i_from_brand <<endl;
 	}else{
 		//-------------------------------------------------
+		BuyImformation begin_day,end_day;
+		begin_day.visit_datetime_month= f_m_b;
+		begin_day.visit_datetime_day = f_d_b;
+		end_day.visit_datetime_month= f_m_e;
+				end_day.visit_datetime_day = f_d_e;
 
+				if(compare(personi.p_buyimformation[i_buy],begin_day) >=0 &&
+						        compare(end_day,personi.p_buyimformation[i_buy]) >= 0) {
 		if(i_buy - i_from_brand > 0){
 			save_fileb<<personi.p_buyimformation[i_from_brand].brand_id<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~>"<<endl;
 		int daygap_f = -1;
@@ -4087,7 +4099,7 @@ void findthreshold(person personi){
 
 		}
 
-
+	}
 		//-------------------------------------------------
 		//save_file<<  brand_id_p<<"\t"<< -1*(i_buy - i_from_brand) <<endl;
 	}
@@ -4098,3 +4110,181 @@ void findthreshold(person personi){
 	save_fileb << "<------------------" << endl;
 	save_filen << "<------------------" << endl;
 }
+
+//需找一个人的查看阈值
+void findthreshold2(person personi,
+		int f_m_b,int f_d_b,int f_m_e,int f_d_e){
+		//,int *& buylist,int& len_buylist){
+
+	ofstream save_fileb("findthresholdb.txt",ios::app);//在文档后追加
+	ofstream save_filen("findthresholdn.txt",ios::app);
+	save_fileb<<personi.get_person_id()<<"------------------>"<<endl;
+
+	int brand_id_p = personi.p_buyimformation[0].brand_id;
+	int i_from_brand = 0;
+	int i_to_brand = 0;
+
+	do{
+	for(;i_to_brand<personi.leng_s_p_buyim;i_to_brand++){
+		//cout<<i_to_brand<<"\t"<<personi.p_buyimformation[i_to_brand].type<<endl;
+		if(personi.p_buyimformation[i_to_brand].brand_id != brand_id_p){
+			break;
+		}
+	}
+
+	int i_buy = i_from_brand;
+	for(;i_buy<i_to_brand;i_buy++){
+
+		if(personi.p_buyimformation[i_buy].type == 1){
+			break;
+		}
+	}
+
+	double arry_check[2][70];
+	int len_arry_check = 0;
+
+	if(i_buy == i_to_brand){
+		//没有购买
+		len_arry_check = 0;
+
+		if(i_buy - i_from_brand > 0){
+
+			save_filen<<personi.p_buyimformation[i_from_brand].brand_id<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~>"<<endl;
+		int daygap_f = -1;
+		int num_check = 0;
+		for(int i=i_from_brand;i<i_buy;i++){
+			if(day_gap(personi.p_buyimformation[i].visit_datetime_month,personi.p_buyimformation[i].visit_datetime_day,4,15) > daygap_f){
+				if(num_check != 0){
+					save_filen<<daygap_f<<"\t"<<num_check<<endl;
+				arry_check[0][len_arry_check] = double(daygap_f);
+				arry_check[1][len_arry_check] = double(num_check);
+				len_arry_check++;
+				}
+				daygap_f= day_gap(personi.p_buyimformation[i].visit_datetime_month,personi.p_buyimformation[i].visit_datetime_day,4,15);
+
+				num_check += 1;
+
+			}else{
+				num_check += 1;
+			}
+
+
+		}
+		save_filen<<daygap_f<<"\t"<<num_check<<endl;
+				arry_check[0][len_arry_check] = double(daygap_f);
+				arry_check[1][len_arry_check] = double(num_check);
+				len_arry_check++;
+
+
+		}
+		double r_check = 0;
+		r_check=fit(arry_check[0],arry_check[1],len_arry_check);
+		save_filen<<"r="<<r_check<<endl;
+
+		//save_file<< brand_id_p<<"\t" << i_to_brand	- i_from_brand <<endl;
+	}else{
+		len_arry_check = 0;
+		//-------------------------------------------------
+		BuyImformation begin_day,end_day;
+		begin_day.visit_datetime_month= f_m_b;
+		begin_day.visit_datetime_day = f_d_b;
+		end_day.visit_datetime_month= f_m_e;
+				end_day.visit_datetime_day = f_d_e;
+
+				if(compare(personi.p_buyimformation[i_buy],begin_day) >=0 &&
+						        compare(end_day,personi.p_buyimformation[i_buy]) >= 0) {
+		if(i_buy - i_from_brand > 0){
+			save_fileb<<personi.p_buyimformation[i_from_brand].brand_id<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~>"<<endl;
+		int daygap_f = -1;
+		int num_check = 0;
+		for(int i=i_from_brand;i<i_buy;i++){
+			if(day_gap(personi.p_buyimformation[i].visit_datetime_month,personi.p_buyimformation[i].visit_datetime_day,4,15) > daygap_f){
+				if(num_check != 0){
+				save_fileb<<daygap_f<<"\t"<<num_check<<endl;
+				arry_check[0][len_arry_check] = double(daygap_f);
+								arry_check[1][len_arry_check] = double(num_check);
+								len_arry_check++;
+
+				}
+				daygap_f= day_gap(personi.p_buyimformation[i].visit_datetime_month,personi.p_buyimformation[i].visit_datetime_day,4,15);
+
+				num_check += 1;
+
+			}else{
+				num_check += 1;
+			}
+
+
+		}
+		save_fileb<<daygap_f<<"\t"<<num_check<<endl;
+		arry_check[0][len_arry_check] = double(daygap_f);
+		arry_check[1][len_arry_check] = double(num_check);
+		len_arry_check++;
+
+
+		}
+		double r_check = 0;
+		r_check=fit(arry_check[0],arry_check[1],len_arry_check);
+		save_fileb<<"r="<<r_check<<endl;
+	}
+		//-------------------------------------------------
+		//save_file<<  brand_id_p<<"\t"<< -1*(i_buy - i_from_brand) <<endl;
+	}
+	brand_id_p = personi.p_buyimformation[i_to_brand].brand_id;
+	i_from_brand = i_to_brand;
+	}while(i_from_brand<personi.leng_s_p_buyim);
+
+	save_fileb << "<------------------" << endl;
+	save_filen << "<------------------" << endl;
+}
+
+
+double fit(double *x,double *y,int num_n){
+
+	/*
+	 * 原理：
+	 * 使用最小二乘法进行线性拟合
+	 * 设y=ax+b
+	 * 设A=Sigma（x_i^2),B=Sigma(x_i),C=Sigma(y_i*x_i),D=Sigam(y_i)
+	 *
+	 * 得：
+	 * 	a=(Cn-BD)/(An-BB)
+	 * 	b=(AD-CB)/(An-BB)
+	 */
+
+	double r = 0;
+	double a,b;
+
+	double A(0),B(0),C(0),D(0);
+
+	for(int i=0;i<num_n;i++){
+		A += x[i]*x[i];
+		B += x[i];
+		C += y[i]*x[i];
+		D += y[i];
+	}
+
+	double n = double(num_n);
+	a = (C*n-B*D)/(A*n-B*B);
+	b = (A*D-C*B)/(A*n-B*B);
+
+	double sum_xy = 0.;
+	double sum_x = 0.;
+	double sum_y = 0;
+	double sum_x2 = 0;
+	double sum_y2 = 0;
+	for(int i=0;i<num_n;i++){
+		sum_xy += x[i]*y[i];
+		sum_x += x[i];
+		sum_y += y[i];
+		sum_x2 += x[i]*x[i];
+		sum_y2 += y[i]*y[i];
+	}
+
+	r = (double(num_n)*sum_xy-sum_x*sum_y)
+			/sqrt((double(num_n)*sum_x2-sum_x*sum_x)*(double(num_n)*sum_y2-sum_y*sum_y));
+
+	return r;
+}
+
+
