@@ -421,7 +421,7 @@ int main() {
 	read_txt(arry_person, leng_s_arry_person);
 
 	//solution4(arry_person, leng_s_arry_person,7,16,8,15);
-	solution5(arry_person, leng_s_arry_person,8, 16, 9, 15);
+	solution4(arry_person, leng_s_arry_person,7, 16, 8, 15);
 
 	return 0;
 }
@@ -2497,9 +2497,9 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 								//branch buyagain{---------------------------------------
 
 								//ev
-								arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
-										p.p_buyimformation[i_brand_e].brand_id;
-								leng_s_a_b_l[i_a_p]++;
+//								arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
+//										p.p_buyimformation[i_brand_e].brand_id;
+//								leng_s_a_b_l[i_a_p]++;
 								//}====================================================
 								/*master
 								 if (!(Pbuy[2][i_Pbuy] >= 0
@@ -2529,16 +2529,16 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 							if (p.p_buyimformation[i_brand_e - 1].brand_id
 									== p.p_buyimformation[i_brand_e].brand_id ) {
 //ev
-								arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
-										p.p_buyimformation[i_brand_e].brand_id;
-								leng_s_a_b_l[i_a_p]++;
+//								arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
+//										p.p_buyimformation[i_brand_e].brand_id;
+//								leng_s_a_b_l[i_a_p]++;
 
 							}
 						} catch (...) {
 //ev
-							arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
-									p.p_buyimformation[i_brand_e].brand_id;
-							leng_s_a_b_l[i_a_p]++;
+//							arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
+//									p.p_buyimformation[i_brand_e].brand_id;
+//							leng_s_a_b_l[i_a_p]++;
 
 						}
 					}
