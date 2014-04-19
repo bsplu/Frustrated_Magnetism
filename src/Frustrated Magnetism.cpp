@@ -54,7 +54,12 @@ void findthreshold2(person personi,
 		int f_m_b,int f_d_b,int f_m_e,int f_d_e
 		,int *& buylist,int& len_buylist);
 double fit(double *x,double *y,int num_n);
-
+void findthreshold3(person personi,
+		int f_m_b,int f_d_b,int f_m_e,int f_d_e
+		,int *& buylist,int& len_buylist);
+void findthreshold4_test(person personi,
+		int f_m_b,int f_d_b,int f_m_e,int f_d_e
+		);
 class BuyImformation {
 public:
 	int brand_id;
@@ -365,7 +370,8 @@ void check_arry_re(int ** &arry_buy_list, int &len_arry_buy_list,
 			int j_ev = 1;
 			for (; j_ev < i_ev; j_ev++) {
 				if (abs(arry_buy_list[i][i_ev])
-						== abs(arry_buy_list[i][j_ev])) {
+						== abs(arry_buy_list[i][j_ev] && arry_buy_list[i][i_ev]!= 0)) {
+					//cout<<arry_buy_list[i][0]<<"\t"<<arry_buy_list[i][i_ev]<<endl;
 					if (arry_buy_list[i][i_ev] > 0) {
 						arry_buy_list[i][i_ev] = 0;
 					} else if (arry_buy_list[i][j_ev] > 0) {
@@ -1745,13 +1751,14 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 
 				check_num_total++;
 
-				if (num_buy_f > 1 || leng_s_buy >= 3 ) {//|| leng_s_buy > 3 num_buy_f > 1
+				if (num_buy_f > 1 || leng_s_buy >= 3 ) {
+				//if (leng_s_buy > 1 ) {
 					buy_num_again++;
 
 					//在预测区间，添加到购买列表中
 					//ev
-//					arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] = buy.brand_id;
-//					leng_s_a_b_l[i_a_p]++;
+					arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] = buy.brand_id;
+					leng_s_a_b_l[i_a_p]++;
 
 					//删除掉该品牌的全部信息
 					for (int i = i_brand_b; i < i_brand_e; i++) {
@@ -2124,15 +2131,17 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 
 
 				if (
-						Pbuy[2][i_Pbuy] >= 10
+						(Pbuy[2][i_Pbuy] >= 10
 						&& Pbuy[1][i_Pbuy] >= 0.07
 						&&
-						daygap < 30) {
+						daygap < 30)
+
+						) {
 
 					//ev
-//					arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
-//							p.p_buyimformation[i_brand_b].brand_id;
-//					leng_s_a_b_l[i_a_p]++;
+					arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
+							p.p_buyimformation[i_brand_b].brand_id;
+					leng_s_a_b_l[i_a_p]++;
 
 				}
 
@@ -2301,7 +2310,7 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 				}else
 
 
-				if(num_check_day >3){
+				if(num_check_day >=3){
 
 					int num_gap = 0;
 				double daybig = int(double(num_check_day) / 5.) + 1;
@@ -2339,7 +2348,7 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 						;
 
 				num_over_check_av = num_over_check_av / pow(2.,3)*2.;
-				//num_over_check_av = 0;
+				num_over_check_av = 0;
 				}else{
 					int num_gap = 0;
 					double daybig = int(double(num_check_day) / 5.) + 1;
@@ -2395,11 +2404,11 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 
 				//branch{-----------------------------------------------------------------------
 				if (num_over_check_av >= 1 ) {
-
+					//cout<<arry_person[i_a_p].get_person_id()<<"\t"<<p.p_buyimformation[i_brand_b].brand_id<<endl;
 					//ev
-//					arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
-//							p.p_buyimformation[i_brand_b].brand_id;
-//					leng_s_a_b_l[i_a_p]++;
+					arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
+							p.p_buyimformation[i_brand_b].brand_id;
+					leng_s_a_b_l[i_a_p]++;
 
 				}
 				//branch}=============================================================
@@ -2488,9 +2497,9 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 								//branch buyagain{---------------------------------------
 
 								//ev
-//								arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
-//										p.p_buyimformation[i_brand_e].brand_id;
-//								leng_s_a_b_l[i_a_p]++;
+								arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
+										p.p_buyimformation[i_brand_e].brand_id;
+								leng_s_a_b_l[i_a_p]++;
 								//}====================================================
 								/*master
 								 if (!(Pbuy[2][i_Pbuy] >= 0
@@ -2520,16 +2529,16 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 							if (p.p_buyimformation[i_brand_e - 1].brand_id
 									== p.p_buyimformation[i_brand_e].brand_id ) {
 //ev
-//								arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
-//										p.p_buyimformation[i_brand_e].brand_id;
-//								leng_s_a_b_l[i_a_p]++;
+								arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
+										p.p_buyimformation[i_brand_e].brand_id;
+								leng_s_a_b_l[i_a_p]++;
 
 							}
 						} catch (...) {
 //ev
-//							arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
-//									p.p_buyimformation[i_brand_e].brand_id;
-//							leng_s_a_b_l[i_a_p]++;
+							arry_buy_list[i_a_p][leng_s_a_b_l[i_a_p]] =
+									p.p_buyimformation[i_brand_e].brand_id;
+							leng_s_a_b_l[i_a_p]++;
 
 						}
 					}
@@ -2542,6 +2551,8 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 			}
 		}
 
+		//ev
+		findthreshold3(arry_person[i_a_p],f_m_b,f_d_b,f_m_e,f_d_e,arry_buy_list[i_a_p],leng_s_a_b_l[i_a_p]);
 		findthreshold2(arry_person[i_a_p],f_m_b,f_d_b,f_m_e,f_d_e,arry_buy_list[i_a_p],leng_s_a_b_l[i_a_p]);
 	}
 
@@ -2563,19 +2574,19 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 				//master{---------------------------------------------------------
 
 				if (arry_buy_list[i_a_p][i_a_p_b] == Pbuy[0][j]) {
-
-					if (Pbuy[2][j] >= 60 && Pbuy[1][j] < 0.03) {
-						arry_buy_list[i_a_p][i_a_p_b] = 0;
-						break;
-					} else if (Pbuy[2][j] >= 50 && Pbuy[2][j] < 60
-							&& Pbuy[1][j] < 0.07) {
-						arry_buy_list[i_a_p][i_a_p_b] = 0;
-						break;
-					} else if (Pbuy[2][j] >= 40 && Pbuy[2][j] < 50
-							&& Pbuy[1][j] < 0.1) {
-						arry_buy_list[i_a_p][i_a_p_b] = 0;
-						break;
-					}
+//ev
+//					if (Pbuy[2][j] >= 60 && Pbuy[1][j] < 0.03) {
+//						arry_buy_list[i_a_p][i_a_p_b] = 0;
+//						break;
+//					} else if (Pbuy[2][j] >= 50 && Pbuy[2][j] < 60
+//							&& Pbuy[1][j] < 0.07) {
+//						arry_buy_list[i_a_p][i_a_p_b] = 0;
+//						break;
+//					} else if (Pbuy[2][j] >= 40 && Pbuy[2][j] < 50
+//							&& Pbuy[1][j] < 0.1) {
+//						arry_buy_list[i_a_p][i_a_p_b] = 0;
+//						break;
+//					}
 				}
 
 				//master}==========================================================
@@ -2605,16 +2616,16 @@ void solution4(person * arry_person_input, int leng_s_arry_person_input,
 			}
 			//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!21110
 
-//			if(
-//					arry_buy_list[i_a_p][i_a_p_b] == 21146
-//				||	arry_buy_list[i_a_p][i_a_p_b] == 	21110
-//				||	arry_buy_list[i_a_p][i_a_p_b] == 25687
-//				||	arry_buy_list[i_a_p][i_a_p_b] == 5470
-//				||	arry_buy_list[i_a_p][i_a_p_b] == 17214
+			if(
+					arry_buy_list[i_a_p][i_a_p_b] == 21146
+				||	arry_buy_list[i_a_p][i_a_p_b] == 	21110
+				||	arry_buy_list[i_a_p][i_a_p_b] == 25687
+				||	arry_buy_list[i_a_p][i_a_p_b] == 5470
+				||	arry_buy_list[i_a_p][i_a_p_b] == 17214
 
-//				){
-//				arry_buy_list[i_a_p][i_a_p_b] = 0;
-//			}
+				){
+				arry_buy_list[i_a_p][i_a_p_b] = 0;
+			}
 
 			/*
 			 * 21146只会在7.8号购买
@@ -2962,7 +2973,7 @@ void solution5(person * arry_person_input, int leng_s_arry_person_input,
 	for(int i_a_p = 0;i_a_p<leng_s_arry_person;i_a_p++){
 
 		cout<<arry_person[i_a_p].get_person_id()<<endl;
-			findthreshold(arry_person[i_a_p],7,16,8,15);
+			findthreshold4_test(arry_person[i_a_p],7,16,8,15);
 
 	}
 
@@ -4147,7 +4158,7 @@ void findthreshold2(person personi,
 		}
 	}
 
-	double arry_check[2][70];
+	double arry_check[2][140];
 	int len_arry_check = 0;
 
 	if(i_buy == i_to_brand){
@@ -4188,16 +4199,23 @@ void findthreshold2(person personi,
 		r_check=fit(arry_check[0],arry_check[1],len_arry_check);
 		save_filen<<"r="<<r_check<<endl;
 		bool TFfit = false;
-		if(r_check <0.7 || (r_check >0.87 && r_check < 0.94) || r_check > 0.98){
+		if(r_check <0.7 || (r_check >0.87 && r_check < 0.93) || r_check > 0.97){
 			TFfit =true;
 		}
-		if(len_arry_check>=3 && TFfit && arry_check[0][len_arry_check-1]>60){
+		if(len_arry_check>=3 && TFfit && arry_check[0][len_arry_check-1]>(55.+30.*(double(f_m_b)-7))){
+			//cout<<personi.get_person_id()<<"\t"<<brand_id_p<<endl;
 			buylist[len_buylist] = brand_id_p;
 			len_buylist++;
+		}else if(len_arry_check == 2 && false ){
+			if((arry_check[0][1]-arry_check[0][0]< 3 && arry_check[0][len_arry_check-1]>90)){
+				buylist[len_buylist] = brand_id_p;
+				len_buylist++;
+			}
 		}
 
 		//save_file<< brand_id_p<<"\t" << i_to_brand	- i_from_brand <<endl;
 	}else{
+		//for(i_buy = i_to_brand-1;i_buy>=i_from_brand;)
 		/*
 		len_arry_check = 0;
 		//-------------------------------------------------
@@ -4303,4 +4321,327 @@ double fit(double *x,double *y,int num_n){
 	return r;
 }
 
+void findthreshold3(person personi,
+		int f_m_b,int f_d_b,int f_m_e,int f_d_e
+		,int *& buylist,int& len_buylist){
 
+
+	ofstream save_fileb("findthresholdb.txt",ios::app);//在文档后追加
+	ofstream save_filen("findthresholdn.txt",ios::app);
+	save_fileb<<personi.get_person_id()<<"------------------>"<<endl;
+	save_filen<<personi.get_person_id()<<"------------------>"<<endl;
+	int brand_id_p = personi.p_buyimformation[0].brand_id;
+	int i_from_brand = 0;
+	int i_to_brand = 0;
+
+	do{
+	for(;i_to_brand<personi.leng_s_p_buyim;i_to_brand++){
+		//cout<<i_to_brand<<"\t"<<personi.p_buyimformation[i_to_brand].type<<endl;
+		if(personi.p_buyimformation[i_to_brand].brand_id != brand_id_p){
+			break;
+		}
+	}
+
+	int i_buy = i_from_brand;
+	for(;i_buy<i_to_brand;i_buy++){
+//		cout<<brand_id_p<<"\t"<<personi.p_buyimformation[i_buy].type<<"\t"<<
+//				personi.p_buyimformation[i_buy].visit_datetime_month<<"."<<
+//				personi.p_buyimformation[i_buy].visit_datetime_day<<endl;
+		if(personi.p_buyimformation[i_buy].type == 1){
+			break;
+		}
+	}
+//cout<<"-----------------------------------------------------"<<endl;
+
+	if(i_buy == i_to_brand){
+		//没有购买
+
+
+		if(i_buy - i_from_brand > 0){
+			bool zhong1 =false;
+			bool zhong2 =false;
+			bool zhong3 =false;
+			bool bigger82 = false;
+			bool bigger83 = false;
+
+			save_filen<<personi.p_buyimformation[i_from_brand].brand_id<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~>"<<endl;
+		int daygap_f = -1;
+		int num_check = 0;
+		for(int i=i_from_brand;i<i_buy;i++){
+			if(day_gap(personi.p_buyimformation[i].visit_datetime_month,personi.p_buyimformation[i].visit_datetime_day,4,15) > daygap_f){
+				if(num_check != 0){
+					if(daygap_f>=51+31*(f_m_b-7) && daygap_f<=52+31*(f_m_b-7)){
+						zhong1 = true;
+					}else if(daygap_f>=72+31*(f_m_b-7) && daygap_f<=73+31*(f_m_b-7)){
+						zhong2 = true;
+						if(num_check>=8){
+							bigger82 =true;
+						}
+					}else if(daygap_f>=88+31*(f_m_b-7) && daygap_f<=91+31*(f_m_b-7)){
+						zhong3 = true;
+						if(num_check>=8){
+							bigger83= true;
+						}
+					}
+				save_filen<<daygap_f<<"\t"<<num_check<<endl;
+
+				}
+				daygap_f= day_gap(personi.p_buyimformation[i].visit_datetime_month,personi.p_buyimformation[i].visit_datetime_day,4,15);
+
+				num_check = 1;
+
+			}else{
+				num_check += 1;
+			}
+
+
+		}
+		if(daygap_f>=51+31*(f_m_b-7) && daygap_f<=52+31*(f_m_b-7)){
+								zhong1 = true;
+							}else if(daygap_f>=72+31*(f_m_b-7) && daygap_f<=73+31*(f_m_b-7)){
+								zhong2 = true;
+								if(num_check>=8){
+									bigger82 =true;
+								}
+							}else if(daygap_f>=88+31*(f_m_b-7) && daygap_f<=91+31*(f_m_b-7)){
+								zhong3 = true;
+								if(num_check>=8){
+									bigger83= true;
+								}
+							}
+		save_filen<<daygap_f<<"\t"<<num_check<<endl;
+
+		if((zhong1 && zhong2) || (zhong2 && zhong3) || (zhong1 && zhong3)
+				|| bigger82 || bigger83){
+			buylist[len_buylist]= brand_id_p;
+			len_buylist++;
+		}
+		}
+
+
+		//save_file<< brand_id_p<<"\t" << i_to_brand	- i_from_brand <<endl;
+	}else{
+		//-------------------------------------------------
+		BuyImformation begin_day,end_day;
+		begin_day.visit_datetime_month= f_m_b;
+		begin_day.visit_datetime_day = f_d_b;
+		end_day.visit_datetime_month= f_m_e;
+				end_day.visit_datetime_day = f_d_e;
+
+				if(compare(personi.p_buyimformation[i_buy],begin_day) >=0 &&
+						        compare(end_day,personi.p_buyimformation[i_buy]) >= 0) {
+		if(i_buy - i_from_brand > 0){
+			save_fileb<<personi.p_buyimformation[i_from_brand].brand_id<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~>"<<endl;
+		int daygap_f = -1;
+		int num_check = 0;
+		for(int i=i_from_brand;i<i_buy;i++){
+			if(day_gap(personi.p_buyimformation[i].visit_datetime_month,personi.p_buyimformation[i].visit_datetime_day,4,15) > daygap_f){
+				if(num_check != 0){
+				save_fileb<<daygap_f<<"\t"<<num_check<<endl;
+
+				}
+				daygap_f= day_gap(personi.p_buyimformation[i].visit_datetime_month,personi.p_buyimformation[i].visit_datetime_day,4,15);
+
+				num_check = 1;
+
+			}else{
+				num_check += 1;
+			}
+
+
+		}
+		save_fileb<<daygap_f<<"\t"<<num_check<<endl;
+
+
+		}
+
+	}
+		//-------------------------------------------------
+		//save_file<<  brand_id_p<<"\t"<< -1*(i_buy - i_from_brand) <<endl;
+	}
+	brand_id_p = personi.p_buyimformation[i_to_brand].brand_id;
+	i_from_brand = i_to_brand;
+	}while(i_from_brand<personi.leng_s_p_buyim);
+
+	save_fileb << "<------------------" << endl;
+	save_filen << "<------------------" << endl;
+
+}
+
+//查找买过一次又买一次的查看规律
+void findthreshold4_test(person personi,
+		int f_m_b,int f_d_b,int f_m_e,int f_d_e
+		){
+
+
+
+	ofstream save_fileb("findthresholdb.txt",ios::app);//在文档后追加
+	ofstream save_filen("findthresholdn.txt",ios::app);
+	save_fileb<<personi.get_person_id()<<"------------------>"<<endl;
+	save_filen<<personi.get_person_id()<<"------------------>"<<endl;
+	int brand_id_p = personi.p_buyimformation[0].brand_id;
+	int i_from_brand = 0;
+	int i_to_brand = 0;
+	if(personi.get_person_id()==12173500 && brand_id_p == 554){
+		system("pause");
+	}
+	do{
+	for(;i_to_brand<personi.leng_s_p_buyim;i_to_brand++){
+		//cout<<i_to_brand<<"\t"<<personi.p_buyimformation[i_to_brand].type<<endl;
+		if(personi.p_buyimformation[i_to_brand].brand_id != brand_id_p){
+			break;
+		}
+	}
+
+	int i_buy = i_from_brand;
+	for(;i_buy<i_to_brand;i_buy++){
+//		cout<<brand_id_p<<"\t"<<personi.p_buyimformation[i_buy].type<<"\t"<<
+//				personi.p_buyimformation[i_buy].visit_datetime_month<<"."<<
+//				personi.p_buyimformation[i_buy].visit_datetime_day<<endl;
+		if(personi.p_buyimformation[i_buy].type == 1){
+			break;
+		}
+	}
+//cout<<"-----------------------------------------------------"<<endl;
+
+	if(i_buy == i_to_brand){
+		//没有购买
+/*
+
+		if(i_buy - i_from_brand > 0){
+			bool zhong1 =false;
+			bool zhong2 =false;
+			bool zhong3 =false;
+			bool bigger82 = false;
+			bool bigger83 = false;
+
+			save_filen<<personi.p_buyimformation[i_from_brand].brand_id<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~>"<<endl;
+		int daygap_f = -1;
+		int num_check = 0;
+		for(int i=i_from_brand;i<i_buy;i++){
+			if(day_gap(personi.p_buyimformation[i].visit_datetime_month,personi.p_buyimformation[i].visit_datetime_day,4,15) > daygap_f){
+				if(num_check != 0){
+					if(daygap_f>=51+31*(f_m_b-7) && daygap_f<=52+31*(f_m_b-7)){
+						zhong1 = true;
+					}else if(daygap_f>=72+31*(f_m_b-7) && daygap_f<=73+31*(f_m_b-7)){
+						zhong2 = true;
+						if(num_check>=8){
+							bigger82 =true;
+						}
+					}else if(daygap_f>=88+31*(f_m_b-7) && daygap_f<=91+31*(f_m_b-7)){
+						zhong3 = true;
+						if(num_check>=8){
+							bigger83= true;
+						}
+					}
+				save_filen<<daygap_f<<"\t"<<num_check<<endl;
+
+				}
+				daygap_f= day_gap(personi.p_buyimformation[i].visit_datetime_month,personi.p_buyimformation[i].visit_datetime_day,4,15);
+
+				num_check = 1;
+
+			}else{
+				num_check += 1;
+			}
+
+
+		}
+		if(daygap_f>=51+31*(f_m_b-7) && daygap_f<=52+31*(f_m_b-7)){
+								zhong1 = true;
+							}else if(daygap_f>=72+31*(f_m_b-7) && daygap_f<=73+31*(f_m_b-7)){
+								zhong2 = true;
+								if(num_check>=8){
+									bigger82 =true;
+								}
+							}else if(daygap_f>=88+31*(f_m_b-7) && daygap_f<=91+31*(f_m_b-7)){
+								zhong3 = true;
+								if(num_check>=8){
+									bigger83= true;
+								}
+							}
+		save_filen<<daygap_f<<"\t"<<num_check<<endl;
+
+		if((zhong1 && zhong2) || (zhong2 && zhong3) || (zhong1 && zhong3)
+				|| bigger82 || bigger83){
+			buylist[len_buylist]= brand_id_p;
+			len_buylist++;
+		}
+		}
+
+
+		//save_file<< brand_id_p<<"\t" << i_to_brand	- i_from_brand <<endl;
+		*/
+	}else{
+		//-------------------------------------------------
+		BuyImformation begin_day,end_day;
+				begin_day.visit_datetime_month= f_m_b;
+				begin_day.visit_datetime_day = f_d_b;
+				end_day.visit_datetime_month= f_m_e;
+						end_day.visit_datetime_day = f_d_e;
+				bool TFbuyinday = false;//是否在规定区间买过商品
+				int buyday[130];//记录不在预测范围内的购买
+				int len_buyday = 0;
+
+		for(int i=i_to_brand-1;i>=i_from_brand;i--){
+			if(personi.p_buyimformation[i].type == 1 ){
+
+			if(
+					compare(personi.p_buyimformation[i],begin_day) >=0 &&
+									        compare(end_day,personi.p_buyimformation[i]) >= 0) {
+								i_buy = i;
+								TFbuyinday =true;
+							}else{
+								buyday[len_buyday] = i;
+								len_buyday++;
+							}
+		}
+		}
+		if(TFbuyinday && len_buyday>0){
+			save_fileb<<brand_id_p<<"~~~~~~~~~~~~~~~~~~~>"<<endl;
+			int daygap_f = -1;
+			int num_check = 0;
+			for(int i=i_from_brand;i<i_to_brand;i++){
+				//跳过购买的天数
+				if(personi.p_buyimformation[i].type!=1 && compare(personi.p_buyimformation[i],begin_day) < 0){
+				if(day_gap(personi.p_buyimformation[i].visit_datetime_month,personi.p_buyimformation[i].visit_datetime_day,4,15) > daygap_f){
+					if(num_check != 0){
+						save_fileb<<daygap_f<<"\t"<<num_check<<endl;
+
+					}
+					daygap_f= day_gap(personi.p_buyimformation[i].visit_datetime_month,personi.p_buyimformation[i].visit_datetime_day,4,15);
+
+					num_check = 1;
+
+				}else{
+					num_check += 1;
+				}
+
+				}
+			}
+			if(daygap_f>-1){
+			save_fileb<<daygap_f<<"\t"<<num_check<<endl;
+			}
+
+			for(int i=0;i<len_buyday;i++){
+				save_fileb<<day_gap(personi.p_buyimformation[buyday[i]].visit_datetime_month
+						,personi.p_buyimformation[buyday[i]].visit_datetime_day
+						,4,15)
+						<<"\t"<<-1<<endl;
+			}
+		}
+
+
+		//-------------------------------------------------
+		//save_file<<  brand_id_p<<"\t"<< -1*(i_buy - i_from_brand) <<endl;
+	}
+	brand_id_p = personi.p_buyimformation[i_to_brand].brand_id;
+	i_from_brand = i_to_brand;
+	}while(i_from_brand<personi.leng_s_p_buyim);
+
+	save_fileb << "<------------------" << endl;
+	save_filen << "<------------------" << endl;
+
+
+
+}
